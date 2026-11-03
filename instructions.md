@@ -1,0 +1,69 @@
+# Quarter 1 Project
+
+- The checkpoint is due on during the first week of November (Friday, Nov 6th). Read [this page](https://dsc-capstone.org/2026-27/assignments/projects/q1-week5-checkin) for what to expect in this checkpoint.
+- The entire project is due during the last week of classes (Friday, Dec 4th).
+
+You will submit both the code and reports you generate for both the checkpoint and final submission to **Gradescope**. You may work on your Quarter 1 Project individually or in a group of up to 4. If you’re working in a group, you should submit everything to Gradescope as a group. Multiple submissions by members of the team will result in a penalty.
+
+---
+
+## Overview
+
+This quarter, under the guidance of your mentor, you’re working through a guided project (e.g. paper replication) that introduces you to the domain. By the end of the quarter, you will summarize the results of your work in a well-organized report that follows the norms of research papers in your domain.
+
+Your work will go beyond mere paraprhasing existing work that you study:
+
+- Your domain may be taking a broader or narrower view than the work of any one paper. Your report will reflect the work *you* are doing, not the broader research that may be found in the work being studied.
+- You will likely be using data that differs from that used in the work you are studying.
+- Your conclusions may be different than the work you are studying. You should present the conclusions drawn from *your* data/methods and address any discrepancies with the work being studied.
+- The code supporting your work will conform to best practices in data science software development.
+
+---
+
+## Deliverables
+
+There are two deliverables, both of which have an associated checkpoint. Your final deliverables are graded according to [this rubric](https://dsc-capstone.org/2026-27/syllabus#general-rubric).
+
+1. [Report (Graded by your mentor)](https://dsc-capstone.org/2026-27/assignments/projects/q1/#report-graded-by-your-mentor)
+2. [Code (Graded by your TA)](https://dsc-capstone.org/2026-27/assignments/projects/q1/#code-graded-by-your-ta)
+
+---
+
+## Report (Graded by your mentor)
+
+The objectives for your report are described below.
+
+- By carefully explaining work in your area, you’ll understand the area you’ll be working in very well, down to the details. In particular, this process will allow you to understand how to draw a rigorous conclusion in your domain.
+- By emulating finished work in your domain, you’ll learn how to effectively communicate technical ideas in your domain.
+- By using and critiquing existing methodologies and conclusions, you’ll devise possible improvements to these methodologies that you can use in your Quarter 2 Project.
+- By working on the literature review, contained in the introduction section of your report, you’ll create a foundation for your Quarter 2 Project.
+- By working on the report, you’ll gain practice with using tools (such as LaTeX, Markdown, and Jupyter Notebooks) for producing such reports.
+- By writing code alongside your report, you’ll develop a library of useful code that can be used in your Quarter 2 Project.
+
+You will submit your report as a PDF to Gradescope. Your final report will need to be written in LaTeX, using the LaTeX template on Overleaf linked below.
+
+[**Access the LaTeX template on Overleaf here.**](https://www.overleaf.com/read/swwcqhtsdwbg#80379d)
+
+Both the above template and the guidelines from the methodology lessons will provide you with suggested headings for your report, but it’s ultimately up to your mentor as to how they’d like you to organize your report.
+
+If you’re working on your Quarter 1 Project in a group, you’ll also need to submit a contributions statement, which we will release as a separate assignment on Gradescope towards the end of the quarter. There, for each member of your group, you’ll need to provide your best estimate for the amount of work they contributed to your Quarter 1 Project. For instance, if your group has 3 members, you may say something like “Person A: 40%, Person B: 30%, Person C: 30%.” If these statements contradict each other in a team, the instructor will decide individual grades based on interviews with team members.
+
+**Checkpoint**
+
+As your report checkpoint, you will submit the title, abstract, and introduction sections of your report. Note that your introduction itself will have three sections – an introductory paragraph, a literature review and discussion of prior work, and a description of relevant data. Intuitively, your checkpoint should contain a summary of the problem you are working on this quarter, with some context on why it’s interesting, along with anything your mentor wants you to include.
+
+---
+
+## Code (Graded by your TA)
+
+The code you write for your Quarter 1 Project must be stored in a public GitHub repository. The primary ask we have of your code is that it is **reproducible**. That is, in a file named `README.md` in your repo, you should provide detailed instructions on how others can run your code. It should describe:
+
+- How to access and store the necessary data.
+- The software dependencies needed to run the code. (In Lesson 8 (to come), we will cover various approaches, including `conda` environments and Docker.)
+- The commands one needs to run to reproduce your results. (The methodology lessons will teach you how to create build scripts.)
+
+In your Week 5 and Week 9/10 TA Check-Ins, your TA will go over your code and provide you with feedback on how it should be structured.
+
+**Checkpoint**
+
+As your code checkpoint, you’ll just submit a link to a GitHub repository containing any code you’ve already written.
