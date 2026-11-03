@@ -1,4 +1,4 @@
-# dsc180a-project-checkpoint
+# dsc180a-project
 
 DSC 180A Quarter 1 group project.
 
