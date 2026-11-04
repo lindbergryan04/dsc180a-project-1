@@ -13,7 +13,7 @@ Jeff Candy (GA)
 
 ## Group members:
 Ryan Lindberg
-Sweekrit Bahtnagar
+Sweekrit Bhatnagar
 Joseph Calderon (Joey)
 Aryan Nath
 
