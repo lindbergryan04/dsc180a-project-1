@@ -1,10 +1,11 @@
 # Data
 
-The project uses TGLF simulations to train surrogate models of turbulent
-transport in a DIII-D plasma. The main prediction targets are ion heat flux
-(`Q_i`), electron heat flux (`Q_e`), and electron particle flux (`Gamma_e`).
-The DIII-D database is the main training dataset; the earlier `scan_db`
-database provides a comparison model.
+The project uses TGLF simulations to explore and compare surrogate methods
+for turbulent transport. The prediction targets are ion heat flux (`Q_i`),
+electron heat flux (`Q_e`), and electron particle flux (`Gamma_e`). Current
+report results use the starter scans and `scan_db`, with additional data for
+evaluation. A new DIII-D training database is part of the planned case study;
+the `scan_db` surrogate will provide a comparison model.
 
 ## Sources and access
 

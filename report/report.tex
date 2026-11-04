@@ -1,0 +1,480 @@
+% !TEX TS-program = xelatex
+% !BIB TS-program = bibtex
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fontspec}
+% Preserve the course style when its optional code font is unavailable.
+\IfFontExistsTF{Fira Code}{}{%
+  \defaultfontfeatures[Fira Code]{UprightFont=lmmono10-regular.otf}}
+\usepackage{style/dsc180reportstyle}
+\hypersetup{hidelinks}
+\raggedbottom
+\widowpenalty=10000
+\clubpenalty=10000
+
+\title{Neural Network Surrogates for TGLF: Prediction Accuracy and Uncertainty}
+\author{Ryan Lindberg \And
+  Sweekrit Bhatnagar \And
+  Joseph Calderon \And
+  Aryan Nath \AND
+  {\normalfont Mentors: Emily Belli, Jeff Candy, and Igor Sfiligoi}}
+% Confirm author spelling, order, and mentor attribution before submission.
+% Evidence locations and outstanding group work are recorded in draft_notes.md.
+
+\begin{document}
+\maketitle
+\begin{center}
+\small Quarter 1 checkpoint draft
+\end{center}
+
+\begin{abstract}
+Repeated evaluations of plasma transport models can be costly. This project
+investigates methods for approximating the ion heat, electron heat, and electron
+particle fluxes predicted by the trapped gyro-Landau fluid (TGLF) model.
+We explore the supplied simulation data, compare candidate models, and test
+choices in input representation, network design, and training. An initial
+study of 43 scan cases shows that greater model flexibility does not consistently
+improve prediction and that low aggregate error can coexist with incorrect
+flux signs. On a larger parameter-scan database, a five-network ensemble
+reduces test root mean squared error by 59.6\%--77.2\% relative to a linear
+baseline across the three outputs. A controlled activation comparison also
+reveals different tradeoffs for heat and particle flux prediction. These are
+preliminary results from an exploratory evaluation process. They support
+further development of the ensemble while motivating checks of physical
+trends, training data requirements, and uncertainty. A complete ranking of
+the group's candidate methods remains open.
+\end{abstract}
+
+\begin{center}
+Code: \url{https://github.com/lindbergryan04/dsc180a-project-1}
+\end{center}
+
+\section{Introduction}
+\subsection{Problem and project scope}
+
+Turbulence transports heat and particles across a tokamak plasma and affects
+its temperature and density profiles. Predicting these fluxes is part of
+modeling plasma confinement. Detailed turbulence simulations are expensive,
+and even reduced models such as TGLF can become costly when a larger
+calculation requires many evaluations \citep{meneghini2017, cao2026}.
+A surrogate learns to approximate a simulation from previously computed
+input-output pairs, making repeated predictions less expensive.
+
+Our research question is which modeling approaches and design choices provide
+useful approximations of TGLF under the available data and computational
+constraints. We began by examining the plasma inputs, output scales, and data
+quality, then explored regression, tree-based, and neural network methods.
+We assess choices through prediction error, computational cost, and behavior
+across plasma conditions. Uncertainty estimates provide an additional way to
+examine model reliability. DIII-D is an application within this investigation.
+
+The prediction targets are ion heat flux $Q_i$, electron heat flux $Q_e$, and
+electron particle flux $\Gamma_e$. The reference values are TGLF outputs.
+Agreement with these values measures approximation of TGLF; it does not by
+itself establish agreement with experimental measurements or nonlinear
+gyrokinetic simulations. This checkpoint reports an exploratory comparison on
+a small scan dataset and a more developed neural network study on a larger
+database. The distinction between these experiments matters when interpreting
+which methods performed well.
+
+\subsection{Literature review and prior work}
+
+\citet{meneghini2017} developed neural network surrogates of TGLF and EPED1
+and incorporated them into a coupled core and pedestal modeling workflow.
+Their TGLF architecture description in Section~3.1 specifies an ensemble of
+32 independently initialized networks, each with one hidden layer of 60
+neurons. This provides a precedent for averaging networks and a reference
+for investigating ensemble size. It does not establish an optimal member
+count for our data. Our deeper network architecture and training database
+differ from theirs, so our experiments evaluate the approach in a different
+setting.
+
+Model evaluation also requires attention to local behavior.
+\citet{vandeplassche2020} developed QLKNN, a neural network surrogate of the
+QuaLiKiz transport model. Their work emphasizes evaluating local transport
+behavior alongside aggregate prediction error, motivating our checks of flux
+trends and individual prediction failures.
+\citet{cao2026} developed TGLF-WINN using feature engineering, transformed
+flux targets, and supervision of flux contributions at individual
+wavenumbers. Their comparisons of individual design components illustrate
+how controlled experiments can identify useful modeling choices. We use
+integrated flux targets and test simpler representations and network choices;
+we do not implement their wavenumber supervision in the experiments reported here.
+
+Training data selection is another direction in this literature.
+\citet{zanisi2024} introduced Active Deep Ensembles for Plasma Turbulence,
+using neural network ensembles to guide training-data selection for QuaLiKiz
+surrogates. This provides context for studying data requirements and
+uncertainty, although our current experiments use fixed training datasets
+rather than active acquisition. Finally, \citet{dudding2022} developed the
+SAT3 saturation rule using nonlinear CGYRO simulations, with particular
+attention to isotope dependence. The course's starter dataset draws on that
+work, but the added TGLF outputs supplied for our analysis use SAT2. The
+saturation rule and reference simulation must therefore remain explicit.
+
+\subsection{Relevant data}
+
+The starter dataset contains 43 plasma cases arranged in controlled scans
+around a reference condition. Case names identify 26 letter groups and an ion
+isotope. Eight groups contain complete hydrogen, deuterium, and tritium
+triplets. Some inputs change together: for example, the electron and ion
+temperature gradients are equal in these cases. These dependencies limit the
+separate effects that can be inferred from correlations. We retained all 43
+cases after basic validity checks, including cases flagged for further review.
+
+The larger \texttt{scan\_db} dataset contains 5,000 TGLF cases with multiple
+inputs varied simultaneously over prescribed ranges. The sampled continuous
+coordinates use uniform distributions, with collision
+frequency sampled logarithmically. Unlike the starter scans, electron and ion
+temperature gradients vary independently. Each case supplies a complete input
+listing in \texttt{input.tglf.gen} and species-resolved fluxes in
+\texttt{out.tglf.gbflux}. We retain the supplied gyro-Bohm normalization and
+the sign of particle flux.
+
+Additional supplied data support focused checks. The
+\texttt{scan\_db\_outside} collection contains nine groups of 30 cases, each
+placing one input outside its training range. The \texttt{data\_d3d}
+collection includes 300 TGLF evaluations with perturbed inputs around a
+DIII-D reference condition. These serve as evaluation cases in the uncertainty
+study; they are distinct from the new DIII-D training database described in
+the remaining work.
+
+\section{Methods}
+\subsection{Data preparation and representation}
+
+We parsed one row per case, checking numeric values, species identity, and
+flux-file length before assigning output labels. In \texttt{scan\_db}, we
+fixed a 70\%/15\%/15\% training, validation, and test split using random seed
+42. Four cases with negative ion heat flux were held for review; all four
+had been assigned to training. Their signs agree with the labeled run output,
+so the exclusions do not reflect a simple flux-column parsing error. The
+original rows and split assignments were preserved. This leaves 3,496
+training, 750 validation, and 750 test cases. Negative particle flux alone
+was not an exclusion criterion.
+
+The larger-dataset models use 11 inputs: separate temperature gradients, a
+shared density gradient, the ion-to-electron temperature ratio, safety factor,
+elongation, flux-surface shift, normalized minor radius, ion mass, logarithmic
+collision frequency, and magnetic shear. We removed constant and duplicate
+coordinates. Magnetic shear was reconstructed from the TGLF inputs as
+\[
+ s = \frac{\mathtt{Q\_PRIME\_LOC}\,\mathtt{RMIN\_LOC}^{2}}
+          {\mathtt{Q\_LOC}^{2}}.
+\]
+Identifiers and other flux outputs were excluded from the predictors.
+
+The positive heat targets span several orders of magnitude. We modeled
+$\log_{10}Q_i$ and $\log_{10}Q_e$, while retaining signed $\Gamma_e$ on its
+original scale. Inputs and transformed targets were standardized using
+training rows only. Heat predictions were converted back to flux units before
+evaluation. This transformation changes the fitting objective; improved fit
+in logarithmic space need not imply lower error in original units.
+
+\subsection{Exploratory models on the starter scans}
+
+The initial comparison used ten physical input coordinates on the 43 starter
+cases, representing the tied temperature gradients with one coordinate.
+We compared a training-mean baseline, linear regression variants,
+additive splines, quadratic terms with interactions, and a random forest.
+The variants tested logarithmic collision frequency and, for heat fluxes,
+logarithmic targets. The forest used 100 trees, maximum depth four, and a
+minimum leaf size of three.
+
+For outer evaluation, we held out one entire letter group at a time, keeping
+related isotope cases together. Inner five-fold validation, also grouped by
+letter, selected regression ridge penalties from $\{0.1,1,10,100\}$ using
+case-level mean absolute error (MAE). Preprocessing was fitted within the
+training folds. The forest and mean baseline had fixed settings. We report
+outer MAE averaged first within each letter and then across letters, giving
+each group equal weight. Model families were compared using these same outer
+scores, so this is an exploratory screen rather than an untouched final test.
+
+\subsection{Neural network development on the larger database}
+
+We compared a five-network ensemble with two baselines on \texttt{scan\_db}.
+The mean baseline predicts each training target's arithmetic mean in flux
+units. The linear baseline uses standardized inputs and the same transformed
+heat and signed particle targets as the networks, without regularization or
+interaction terms. These baselines differ from the grouped ridge models in
+the starter-data experiment.
+
+Each network has layer widths $11$--$64$--$64$--$8$--$3$ and a linear output
+layer. The five members use seeds 42--46. Training uses AdamW, batch size 256,
+and weight decay $10^{-4}$, with 30 warmup epochs at learning rate $0.001$
+and up to 120 further epochs at $0.003$. Validation selects the saved checkpoint,
+with early stopping after 25 epochs without improvement. Each member's heat
+outputs are inverted before taking the equal-weight average of all five
+predictions.
+
+We tested four activation combinations. The first activation was applied to
+both 64-unit layers, and the second to the 8-unit layer: GELU with tanh,
+ReLU with tanh, GELU with ReLU, and ReLU throughout. Across combinations, we matched initial
+weights and minibatch order within each seed and held the architecture, data,
+scalers, and training settings fixed. The selection score was
+\begin{equation}
+ S = \frac{1}{3}\sum_{j\in\{Q_i,Q_e,\Gamma_e\}}
+       \frac{\operatorname{RMSE}_{\mathrm{val},j}}
+            {\operatorname{SD}_{\mathrm{train},j}},
+ \label{eq:selection}
+\end{equation}
+with both quantities measured in original flux units. This prevents a
+large-scale target from dominating selection. The learning rate came from
+an earlier GELU/tanh search; the alternatives were not separately tuned.
+GELU/ReLU was selected, and its five checkpoints were retained unchanged.
+
+This search was limited to four activation combinations on one architecture
+and one data split, using five matched seeds and a shared training schedule.
+The improvement in aggregate validation error is promising, although the
+selected configuration increased electron-heat error relative to the control.
+These findings motivate further tests across architectures and separately
+tuned training settings rather than a final choice of activation functions.
+
+\subsection{Evaluation and supplementary uncertainty checks}
+
+We report root mean squared error (RMSE) and $R^2$ in addition to the selection
+score. Learning curves use nested training subsets of 250, 500, 1,000, 2,000,
+and 3,496 cases, defined by a fixed permutation with seed 2026. Scalers were
+refitted on each subset, with the same validation set for checkpoint selection.
+We also evaluated the selected ensemble on all 43 starter cases and checked
+the directions of temperature-gradient and isotope trends. These cases were
+already used for exploration, but did not select the activation configuration.
+
+The 750-case random test set had been inspected in earlier work. Consequently,
+the reported comparisons are exploratory and do not constitute a new,
+untouched assessment. The learning curves also use only one nested sequence.
+With a fixed maximum epoch budget, larger subsets receive more minibatch updates per
+epoch, so the curves do not isolate data volume from optimization effort.
+
+A separate 15-network experiment assessed uncertainty using member disagreement.
+For each flux, prediction intervals were centered on the ensemble mean. Their
+half-width was a calibrated multiplier times the larger of the member sample
+standard deviation and 1\% of the training-target standard deviation.
+Multipliers were fitted on the 750 validation cases for nominal 90\% coverage,
+then fixed for subsequent checks. Because validation had already supported
+model selection, coverage is an empirical assessment rather than a formal
+guarantee. These results are reported separately from the five-network
+activation comparison and do not measure the effect of increasing ensemble size.
+
+\section{Preliminary results}
+\subsection{What the small-data comparisons reveal}
+
+Table~\ref{tab:starter} shows that greater flexibility did not consistently
+improve the starter-data predictions. Replacing raw collision frequency with
+its logarithm improved linear-model MAE for all three targets. The fixed
+forest performed worse than that transformed linear model on each target.
+The logarithmic heat model had the lowest electron-heat MAE, while quadratic
+terms had the lowest ion-heat MAE.
+
+\begin{table}[htbp]
+\centering
+\caption{Exploratory starter-data comparison: letter-balanced MAE in
+  gyro-Bohm units across 26 held-out letter groups. Lower is better.
+  These scores use a different dataset and procedure from Table~\ref{tab:test}.
+  The logarithmic heat model was not applied to particle flux.}
+\label{tab:starter}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Model & $Q_i$ & $Q_e$ & $\Gamma_e$ \\
+\midrule
+Training mean & 17.022 & 14.830 & 6.127 \\
+Raw linear & 9.570 & 10.215 & 3.520 \\
+Log-collision linear & 8.295 & 7.695 & 2.725 \\
+Additive splines & 17.528 & 11.475 & 3.911 \\
+Quadratic + interactions & 7.965 & 7.253 & 3.210 \\
+Random forest & 16.302 & 11.267 & 3.484 \\
+Log-heat linear & 10.213 & 5.306 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The lowest MAE did not ensure suitable behavior in every case. The quadratic
+ion-heat model predicted $-1.34$ and $-20.78$ for cases with positive TGLF
+values of $4.90$ and $6.49$, respectively. This motivates examining prediction
+signs and individual failures when selecting a model. The comparison concerns
+43 structured cases and the settings tested here; it does not establish that
+forests or splines are generally unsuitable for TGLF.
+
+\subsection{Baseline performance and activation choices}
+
+On the larger database, the five-network ensemble outperformed the mean and
+linear baselines on all three outputs (Table~\ref{tab:test}). Relative to
+linear regression, test RMSE decreased by 59.6\% for ion heat, 61.8\% for
+electron heat, and 77.2\% for particle flux. This does not establish
+superiority over tree models evaluated elsewhere, or isolate the benefit of
+averaging compared with an otherwise matched single network.
+
+\begin{table}[htbp]
+\centering
+\caption{Performance on the same 750 random test cases from
+  \texttt{scan\_db}. RMSE is in gyro-Bohm units. The test set was previously
+  inspected; these are exploratory results for the selected GELU/ReLU model.}
+\label{tab:test}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & \multicolumn{3}{c}{RMSE} & \multicolumn{3}{c}{$R^2$} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Model & $Q_i$ & $Q_e$ & $\Gamma_e$ & $Q_i$ & $Q_e$ & $\Gamma_e$ \\
+\midrule
+Mean & 76.53 & 60.20 & 20.93 & $-0.009$ & $-0.010$ & $-0.011$ \\
+Linear & 38.43 & 29.48 & 14.43 & 0.746 & 0.758 & 0.519 \\
+Five-network ensemble & 15.53 & 11.27 & 3.29 & 0.959 & 0.965 & 0.975 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The controlled activation comparison selected GELU/ReLU, with a mean
+normalized validation RMSE of 0.1806, compared with 0.1887 for GELU/tanh
+(Table~\ref{tab:activations}). The 4.3\% aggregate improvement came from
+ion heat and particle flux; electron-heat error increased. Replacing all
+hidden activations with ReLU increased the aggregate error by 11.5\%
+relative to GELU/tanh. Thus, neither a uniform activation replacement nor a
+single aggregate score captures every target's response. These results
+support the selected configuration under the fixed training setup, rather
+than a universal ordering of activation functions.
+
+\begin{table}[H]
+\centering
+\caption{Activation comparison on 750 validation cases. The first activation
+  applies to both 64-unit layers and the second to the 8-unit layer.
+  RMSE values are in gyro-Bohm units; $S$ is defined in Eq.~\ref{eq:selection}.}
+\label{tab:activations}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Activations & $S$ & $Q_i$ RMSE & $Q_e$ RMSE & $\Gamma_e$ RMSE \\
+\midrule
+GELU / ReLU & 0.1806 & 15.80 & 13.16 & 4.61 \\
+GELU / tanh & 0.1887 & 17.62 & 12.76 & 4.83 \\
+ReLU / tanh & 0.1935 & 18.15 & 12.93 & 4.99 \\
+ReLU / ReLU & 0.2105 & 18.67 & 15.62 & 5.19 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Training data and computational cost}
+
+The ensemble's errors decreased as the training set grew
+(Figure~\ref{fig:learning}). Mean normalized test RMSE decreased by 50.2\%
+between 250 and 3,496 training cases, compared with 2.9\% for linear regression.
+The ensemble improved by a further 11.1\% between 2,000 and 3,496 cases.
+This run provides evidence that the model still benefited from additional
+training examples over the tested range. It does not establish the amount
+of data needed to reach a specified accuracy.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/learning_curves.png}
+\caption{Learning curves for the selected GELU/ReLU five-network
+  ensemble and both baselines. Each point uses the same previously inspected
+  750-case test set. Subsets form one nested sequence, with no resampling
+  uncertainty bands. Settings are fixed, but larger subsets entail more
+  minibatch updates per epoch.}
+\label{fig:learning}
+\end{figure}
+
+In the recorded DSMLP CPU evaluation, training all five networks took 24.01\,s.
+Median prediction latency was 0.814\,ms for one case, while a batch of 750
+averaged 4.51\,$\mu$s per case. Training used four threads and prediction used
+one. Prediction timings used seven repetitions after warmup and included
+scaling, inverse transformations, and averaging, but excluded model loading,
+file access, and feature construction. The supplied TGLF logs do not provide
+elapsed runtimes, so these measurements do not support a measured
+TGLF-to-surrogate speedup ratio.
+
+\begin{samepage}
+\subsection{Behavior beyond aggregate error}
+
+On the 43 starter cases, the selected ensemble achieved $R^2$ values of
+0.9702, 0.9973, and 0.9876 for $Q_i$, $Q_e$, and $\Gamma_e$, respectively.
+Nevertheless, it matched only 25 of 27 temperature-gradient directions and
+45 of 48 isotope directions, and predicted the wrong particle-flux sign in
+two cases. The validation-selected activation also improved starter-set
+$R^2$ for electron heat relative to GELU/tanh while reducing it for ion heat
+and particle flux. These checks show why an overall score should be read
+alongside local trends and failure cases.
+\end{samepage}
+
+The separate 15-network uncertainty experiment reached empirical random-test
+coverage of 91.2\%, 90.1\%, and 91.9\% for nominal 90\% intervals on the three
+outputs. Coverage and network agreement were less informative in some other
+conditions. In the outside-range collisionality group, ion-heat RMSE was
+1.324 times the ordinary test value while member standard deviation was
+only 0.343 times as large. On the same 300 DIII-D input cases, mean predicted
+particle flux was 0.995 compared with TGLF's 0.483, despite 100\% interval
+coverage. The average interval width was 3.85, in gyro-Bohm units. Broad
+intervals can therefore contain the reference values while the central
+prediction remains biased. The cause of this local bias has not been established.
+
+\section{Discussion and remaining work}
+
+These experiments show that representation and training choices can matter
+as much as model complexity. Logarithmic collision frequency improved the
+small-data linear fits. The larger-data ensemble improved on its baselines,
+but activation changes traded accuracy across outputs. Sign errors, incorrect
+trends, and local bias show why average error and interval coverage alone
+are insufficient.
+
+The conclusions remain limited by the small structured starter set,
+exploratory model-family selection, prior test inspection, and reuse of
+validation data for uncertainty calibration. The learning curves cover one
+nested sequence. Because the experiments use different datasets and
+procedures, they cannot establish one model ranking or determine whether
+ensembles outperform the group's boosted trees or a matched single network.
+
+\subsection{Further model comparisons}
+
+We intend to test whether expanding the ensemble improves prediction enough
+to justify the additional training and inference cost. The 32-network model
+described by \citet{meneghini2017} motivates studying member count as a design
+choice. A controlled comparison will hold the architecture, training data,
+and fitting procedure fixed while varying the number of members, including
+a single-network reference. Our existing five- and fifteen-network analyses
+do not isolate this effect.
+
+Other proposed experiments concern alternative transformations of the input
+features, different network depths and widths, and separate ensembles for
+$Q_i$, $Q_e$, and $\Gamma_e$ in place of the current shared three-output
+networks. The input-transform comparisons will extend beyond the current
+logarithmic collision-frequency representation. Learned transformations will
+be fitted on training data only. These choices will be selected using
+validation data and evaluated for each target, with computational cost
+reported for the full predictor. We will consolidate the group's other models
+under the same evaluation procedure and preserve new assessment cases from
+further tuning.
+
+\subsection{Planned DIII-D study}
+
+Our mentor's November 2 project plan provides a sequence for applying these
+methods to a DIII-D database. The first stage is to run TGLF at 13 supplied
+radial locations and verify the results against the reference answers. The
+Task 4 handout then specifies 500--1,000 additional cases per team member,
+spread across these radii. Five inputs are varied around each reference
+condition: the two temperature gradients, shared density gradient,
+temperature ratio, and collision frequency. The database will retain the
+prescribed geometry at each radius and apply the stated cleaning rule for
+negative heat-flux cases.
+
+The next stages are to train a baseline and neural network for the three
+fluxes, attach uncertainty estimates, and evaluate new input cases supplied
+by the mentors. Learning curves using 500, 1,000, 2,000, and all available
+training cases will examine whether errors continue to decrease, intervals
+shrink, and some input regions remain poorly represented. The final comparison
+will evaluate the broad \texttt{scan\_db} surrogate and the DIII-D-trained
+surrogate on the same DIII-D test cases, assessing both accuracy and the
+reliability of uncertainty estimates.
+
+The plan also lists two possible extensions: comparing surrogate error with
+the discrepancy between TGLF and nonlinear CGYRO outputs, and examining the
+contributions of low- and high-wavenumber turbulence to electron heat flux.
+These extensions are separate from the main comparison. Throughout the
+study, the plan emphasizes correlated plasma inputs, data quality, uncertainty
+estimates for every prediction, and flags for inputs outside the training
+data. This work remains distinct from the completed experiments reported above.
+
+\clearpage
+\makereference
+\bibliography{reference}
+\bibliographystyle{style/dsc180bibstyle}
+\end{document}

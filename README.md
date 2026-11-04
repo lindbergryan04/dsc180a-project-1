@@ -1,10 +1,17 @@
-# dsc180a-project
+# dsc180a-project-1
 
 DSC 180A Quarter 1 group project.
 
 ## Project overview
 
-TODO: Add the project title and research question.
+**Neural Network Surrogates for TGLF: Prediction Accuracy and Uncertainty**
+
+We explore, develop, and compare methods for approximating the ion heat,
+electron heat, and electron particle fluxes predicted by TGLF. Our research
+question is which modeling approaches and design choices provide useful
+predictions under the available data and computational constraints. We assess
+prediction error, computational cost, and behavior across plasma conditions.
+Uncertainty is part of evaluation, and DIII-D is a case study within the project.
 
 ## Mentors:
 Igor Sfiligoi (SDSC)
@@ -22,16 +29,16 @@ Aryan Nath
 | Path | Contents |
 | --- | --- |
 | `src/` | Reserved for reusable data-processing, modeling, and evaluation code. |
-| `notebooks/` | Reserved for exploratory analysis and experiment notebooks. |
+| `notebooks/` | Individual experiment notebooks; Ryan's current analyses and saved outputs are in `notebooks/ryan/`. |
 | `data/README.md` | Dataset descriptions, access instructions, file formats, and quality checks. |
 | `data/Task1_TGLF_SAT3_dataset/` | Task 1 SAT3 starter dataset. |
 | `data/Task2_TGLF_scan/` | Task 2 TGLF parameter-scan data. |
 | `data/Task3_TGLF_Uncertainty/` | Task 3 uncertainty and extrapolation datasets. |
 | `data/Task4_DIIID_Database/` | Task 4 DIII-D database materials. |
-| `emily_slides/` | Mentor slides covering transport, fluxes, uncertainty, and the project plan. |
+| `emily_slides/` | Mentor slides and the group's Week 5 check-in presentation. |
 | `references/` | Research papers used for background and related work. |
 | `tasks/` | Mentor-provided instructions for Tasks 1–4. |
-| `report/` | Report materials; currently contains the course LaTeX template PDF. |
+| `report/` | Checkpoint report source and PDF, references, figures, review notes, and the original course template. |
 | `requirements.txt` | Python dependency list, to be populated as code is added. |
 | `.gitignore` | Excludes datasets, local environments, credentials, and generated build files. |
 
@@ -44,8 +51,10 @@ See [data/README.md](data/README.md) for data access and storage instructions.
 
 ## Environment
 
-Dependencies have not been selected yet. Add the packages and versions used by
-this project to `requirements.txt`, and document the Python version here.
+The shared dependency specification is not complete. `requirements.txt` is
+currently a placeholder. Add the packages and versions used by the submitted
+experiments and document the Python version here before treating this setup
+as a reproducible environment.
 
 Create a local environment from the repository root:
 
@@ -57,11 +66,33 @@ python -m pip install -r requirements.txt
 
 ## Reproduce results
 
-TODO: Add the commands to prepare the data, run the analysis, and generate
-figures and tables. No analysis pipeline or results are included yet.
+The notebooks in `notebooks/ryan/` contain analysis and saved results used in
+the report. Reproduction from a fresh clone has not been verified. Some
+notebooks refer to helpers, model artifacts, and paths outside this repository.
+
+Remaining work: include the required helpers or document how to obtain them,
+complete the dependency specification, configure data and artifact paths, and
+document the commands and execution order needed to reproduce the report's
+figures and tables.
 
 ## Report
 
-Store the LaTeX source and references in `report/`. The report checkpoint
-includes the title, abstract, and introduction (problem context, prior work,
-and relevant data).
+The current checkpoint draft is [report/report.pdf](report/report.pdf), with
+editable source in [report/report.tex](report/report.tex). It includes the
+required title, abstract, and introduction, plus documented methods and
+preliminary results. See [report/README.md](report/README.md) for build
+instructions and [report/draft_notes.md](report/draft_notes.md) for evidence
+locations and remaining group work.
+
+## Contributing to the checkpoint
+
+1. Pull the latest `main` before making changes. Put your experiment notebooks
+   in your own directory under `notebooks/`.
+2. Include the model settings, data splits, preprocessing, metrics, and saved
+   results needed to interpret your experiments. Keep data files out of Git.
+3. Coordinate report edits using `report/todo.txt` and the evidence notes.
+   Edit `report/report.tex`, add citations to `report/reference.bib` and figures
+   to `report/figures/`, then rebuild the PDF using the report's build instructions.
+4. Commit and push your own contribution. The TA requires at least one push
+   from every team member. Review the combined report before the group submits
+   the report PDF and repository link to Gradescope.
