@@ -28,29 +28,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 {\color{blue} Welcome to the Capstone LaTeX template! To use this template:
-\begin{itemize}
-    \item Create an Overleaf account (it's free).
-    \item Click the ``Menu" button in the top left, then click ``Copy Project."
-    \item To share the project with your group members, click ``Share" in the top menu bar, turn on link sharing, and send the edit link to your group members.
-\end{itemize}
+    \begin{itemize}
+        \item Create an Overleaf account (it's free).
+        \item Click the ``Menu" button in the top left, then click ``Copy Project."
+        \item To share the project with your group members, click ``Share" in the top menu bar, turn on link sharing, and send the edit link to your group members.
+    \end{itemize}
 
-The lines you see in blue are instructions from us; \textbf{remove them} or comment them out with \texttt{\%} as you actually edit this template. \textbf{Your actual submissions should not have any blue in them!}
+    The lines you see in blue are instructions from us; \textbf{remove them} or comment them out with \texttt{\%} as you actually edit this template. \textbf{Your actual submissions should not have any blue in them!}
 
-This template mostly exists for style purposes. \textbf{Not all headings provided in the template will actually be useful for you; you can add or remove headings as you please, and the headings you end up using are up to you and your mentor.} Look to the ``Anatomy of a Scientific Paper" section of \href{https://dsc-capstone.org/lessons/04/#anatomy-of-a-scientific-paper}{Methodology Lesson 4} for guidance on which headings to use, and \href{https://dsc-capstone.org/assignments/methodology/05/}{Methodology Lesson 7} for more resources on LaTeX.
+    This template mostly exists for style purposes. \textbf{Not all headings provided in the template will actually be useful for you; you can add or remove headings as you please, and the headings you end up using are up to you and your mentor.} Look to the ``Anatomy of a Scientific Paper" section of \href{https://dsc-capstone.org/lessons/04/#anatomy-of-a-scientific-paper}{Methodology Lesson 4} for guidance on which headings to use, and \href{https://dsc-capstone.org/assignments/methodology/05/}{Methodology Lesson 7} for more resources on LaTeX.
 }
 
 \begin{abstract}
     {
-    \color{blue}
-    Replace the \texttt{lipsum[1]} in the source code with your abstract. Don't include an abstract with your Quarter 2 Proposal.
+        \color{blue}
+        Replace the \texttt{lipsum[1]} in the source code with your abstract. Don't include an abstract with your Quarter 2 Proposal.
     }
     \textcolor{LightGrey}{\lipsum[1]}
 \end{abstract}
 
 {\color{blue} For your Quarter 1 Project, you won't link a website, but will link your code. For your Quarter 2 Proposal, you won't link either of these. For your actual Quarter 2 Project, you'll link both of these.}
 \begin{center}
-Website: \url{https://abc.github.io/} \\
-Code: \url{https://github.com/abc}
+    Website: \url{https://abc.github.io/} \\
+    Code: \url{https://github.com/abc}
 \end{center}
 
 \maketoc
@@ -72,7 +72,7 @@ Code: \url{https://github.com/abc}
 
 \section{\LaTeX{} Typesetting Examples}
 
-{\color{blue} This is not a real section; it's just here to show examples of how to format various components. Remove it before submitting!}
+ {\color{blue} This is not a real section; it's just here to show examples of how to format various components. Remove it before submitting!}
 
 \subsection{\LaTeX{} Basics}
 
@@ -106,7 +106,7 @@ $$\int_{-\infty}^\infty f_X(x)dx = 1$$
 And a chain of equations:
 
 \begin{align*}
-    \frac{1}{n}\sum_{i = 1}^n (x_i - \bar{x})^2 &= \frac{1}{n}\sum_{i = 1}^n (x_i^2 - 2x_i\bar{x} + \bar{x}^2)
+    \frac{1}{n}\sum_{i = 1}^n (x_i - \bar{x})^2 & = \frac{1}{n}\sum_{i = 1}^n (x_i^2 - 2x_i\bar{x} + \bar{x}^2)
     \\ &= \frac{1}{n}\sum_{i = 1}^n x_i^2 - \frac{2}{n}\bar{x}\sum_{i = 1}^n x_i + \frac{\bar{x}^2}{n}\sum_{i = 1}^n 1
     \\ &= \frac{1}{n}\sum_{i = 1}^n x_i^2 - 2\bar{x}^2 + \bar{x}^2
     \\ &= \frac{1}{n}\sum_{i = 1}^n x_i^2 - \bar{x}^2
@@ -115,14 +115,14 @@ And a chain of equations:
 
 \subsection{Figure Examples}
 
-Here are some example figures. 
+Here are some example figures.
 Figure \ref{fig:somefig1} presents a scatter plot.
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=.65\linewidth]{figure/somefig1.pdf}
-\caption{Yes, put a few words or sentences here explaining what is in the figure.}
-\label{fig:somefig1}
+    \centering
+    \includegraphics[width=.65\linewidth]{figure/somefig1.pdf}
+    \caption{Yes, put a few words or sentences here explaining what is in the figure.}
+    \label{fig:somefig1}
 \end{figure}
 
 Figure \ref{fig:someotherfigs} presents some summaries of the performance of our model.
@@ -130,16 +130,16 @@ The left panel of Figure \ref{fig:someotherfigs} presents something.
 The right panel of Figure \ref{fig:someotherfigs} presents some other things.
 
 \begin{figure}[htbp]
-\begin{minipage}{0.53\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{figure/somefig2.png}
-\end{minipage}
-\begin{minipage}{0.42\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{figure/somefig3.png}
-\end{minipage}
-\caption{You can put figures side-by-side as well.}
-\label{fig:someotherfigs}
+    \begin{minipage}{0.53\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure/somefig2.png}
+    \end{minipage}
+    \begin{minipage}{0.42\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure/somefig3.png}
+    \end{minipage}
+    \caption{You can put figures side-by-side as well.}
+    \label{fig:someotherfigs}
 \end{figure}
 
 
@@ -148,17 +148,17 @@ The right panel of Figure \ref{fig:someotherfigs} presents some other things.
 Table \ref{tab:sometab1} presents some summary of the data.
 
 \begin{table}[htbp]
-\caption{Some Table Caption}
-\label{tab:sometab1}
-\resizebox{0.4\linewidth}{!}{\input{table/sometab1}}
+    \caption{Some Table Caption}
+    \label{tab:sometab1}
+    \resizebox{0.4\linewidth}{!}{\input{table/sometab1}}
 \end{table}
 
 Table \ref{tab:sometab2} presents some summaries of the performance of our model.
 
 \begin{table}[htbp]
-\caption{Some Other Table Caption}
-\label{tab:sometab2}
-\resizebox{0.9\linewidth}{!}{\input{table/sometab2}}
+    \caption{Some Other Table Caption}
+    \label{tab:sometab2}
+    \resizebox{0.9\linewidth}{!}{\input{table/sometab2}}
 \end{table}
 
 \subsection{Equations and Algorithms Examples}
@@ -166,49 +166,49 @@ Table \ref{tab:sometab2} presents some summaries of the performance of our model
 Algorithm \ref{alg:fuzzyKmeans} implements Fuzzy K-means.
 
 \begin{algorithm}
-\caption{Fuzzy K-means clustering algorithm}
-\label{alg:fuzzyKmeans}
-\begin{enumerate}
-    \item Choose primary centroids $v_{k}$
-    \item Compute the membership degree of all feature vectors in all clusters
-    \begin{equation}
-    u_{ki}  = \frac{1}{ \sum_{j=1}^K ( \frac{D^{2}(x_{i} - v_{k})}{D^{2}(x_{i} - v_{j})})^\frac{2} 
-    {m-1}}
-    \label{eq:kmeans}
-    \end{equation}
-\end{enumerate}
+    \caption{Fuzzy K-means clustering algorithm}
+    \label{alg:fuzzyKmeans}
+    \begin{enumerate}
+        \item Choose primary centroids $v_{k}$
+        \item Compute the membership degree of all feature vectors in all clusters
+              \begin{equation}
+                  u_{ki}  = \frac{1}{ \sum_{j=1}^K ( \frac{D^{2}(x_{i} - v_{k})}{D^{2}(x_{i} - v_{j})})^\frac{2}
+                      {m-1}}
+                  \label{eq:kmeans}
+              \end{equation}
+    \end{enumerate}
 \end{algorithm}
 
 Algorithm \ref{alg:net} calculates net activation.
 
 
 \begin{algorithm}
-\caption{Computing Net Activation}
-\label{alg:net}
-% \DontPrintSemicolon
-% \LinesNumbered
-\KwIn{$x_1, \ldots, x_n, w_1, \ldots, w_n$}
-\KwOut{$y$, the net activation}
-$y\leftarrow 0$\;
-\For{$i\leftarrow 1$ \KwTo $n$}{
-$y \leftarrow y + w_i*x_i$\;
-}
+    \caption{Computing Net Activation}
+    \label{alg:net}
+    % \DontPrintSemicolon
+    % \LinesNumbered
+    \KwIn{$x_1, \ldots, x_n, w_1, \ldots, w_n$}
+    \KwOut{$y$, the net activation}
+    $y\leftarrow 0$\;
+    \For{$i\leftarrow 1$ \KwTo $n$}{
+        $y \leftarrow y + w_i*x_i$\;
+    }
 \end{algorithm}
 
 In Variational Autoencoder (VAE), we directly maximize the Evidence Lower Bound (ELBO) using the following Equations \ref{eq:bla}--\ref{eq:blablabla}.
 \begin{align}
-  \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p(\boldsymbol{x}, \boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right]
-  &= \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})p(\boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right] \label{eq:bla} \\
-  &= \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})\right] + \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p(\boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right] \label{eq:blabla} \\
-  &= \underbrace{\mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})\right]}_\text{reconstruction term} - \underbrace{\mathcal{D}_{\text{KL}}(q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x}) \mid\mid p(\boldsymbol{z}))}_\text{prior matching term} \label{eq:blablabla}
+    \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p(\boldsymbol{x}, \boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right]
+     & = \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})p(\boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right] \label{eq:bla}                                                                                                                     \\
+     & = \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})\right] + \mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log\frac{p(\boldsymbol{z})}{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\right] \label{eq:blabla}                         \\
+     & = \underbrace{\mathbb{E}_{q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x})}\left[\log p_{\boldsymbol{\theta}}(\boldsymbol{x}\mid\boldsymbol{z})\right]}_\text{reconstruction term} - \underbrace{\mathcal{D}_{\text{KL}}(q_{\boldsymbol{\phi}}(\boldsymbol{z}\mid\boldsymbol{x}) \mid\mid p(\boldsymbol{z}))}_\text{prior matching term} \label{eq:blablabla}
 \end{align}
 
 \subsection{Inline Citation Examples}
 
-Citation in text (no parentheses): use \texttt{{\textbackslash}cite\{citekey\}}. 
+Citation in text (no parentheses): use \texttt{{\textbackslash}cite\{citekey\}}.
 For example, \cite{breiman2011}, \cite{devlin2019bert}.
 
-Citation in parentheses: use \texttt{{\textbackslash}citep\{citekey\}}. 
+Citation in parentheses: use \texttt{{\textbackslash}citep\{citekey\}}.
 For example: \citep{vaswani2023attention}, \citep{karras2019stylebased}.
 
 

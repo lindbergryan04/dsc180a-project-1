@@ -1,25 +1,69 @@
+# ---------------------------------------------------------------------------
 # Python environments and generated files
+# ---------------------------------------------------------------------------
 .venv/
 venv/
+env/
 __pycache__/
 *.py[cod]
 *.egg-info/
+build/
+dist/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .ipynb_checkpoints/
 
+# ---------------------------------------------------------------------------
 # Local configuration and credentials
+# ---------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
+.claude/settings.local.json
 
-# Operating system files
+# ---------------------------------------------------------------------------
+# Editor and operating system files
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*~
+*.tmp
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# Keep datasets out of Git; retain access instructions
+# ---------------------------------------------------------------------------
+# Data: keep datasets out of Git; retain access instructions (data/README.md)
+# ---------------------------------------------------------------------------
 /data/*
 !/data/README.md
 
-# LaTeX build files
+# Raw TGLF datasets used by the notebooks (too large for git). Parsed tables
+# such as notebooks/sbhatnagar/task2/data/sat3_table.csv are small and stay in git.
+notebooks/**/SAT3_dataset/
+notebooks/**/scan_db_outside/
+notebooks/**/data_d3d/
+
+# Downloaded archives
+*.tar.gz
+*.zip
+
+# ---------------------------------------------------------------------------
+# Trained models and large binary artifacts
+# ---------------------------------------------------------------------------
+*.pt
+*.pth
+*.pkl
+*.joblib
+*.h5
+*.npy
+*.npz
+
+# ---------------------------------------------------------------------------
+# LaTeX build files (the report sources and report/report.pdf stay in git)
+# ---------------------------------------------------------------------------
 *.aux
 *.bbl
 *.blg
@@ -27,5 +71,18 @@ __pycache__/
 *.fls
 *.log
 *.out
-*.synctex.gz
 *.toc
+*.lof
+*.lot
+*.thm
+*.bcf
+*.run.xml
+*.xdv
+*.nav
+*.snm
+*.vrb
+*.synctex*
+*-blx.bib
+
+# Output of compiling the course template (the template's own PDF stays tracked)
+report/DSC_Capstone_LaTeX_Template/report.pdf
