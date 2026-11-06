@@ -1,0 +1,307 @@
+{
+  "selected_name": "3-seed ensemble of Deep 64-64-64",
+  "selected_config": {
+    "name": "Deep 64-64-64",
+    "widths": [
+      64,
+      64,
+      64
+    ],
+    "mode": "log"
+  },
+  "ensemble": true,
+  "split_seed": 42,
+  "split_sizes": {
+    "train": 3496,
+    "validation": 750,
+    "test": 750,
+    "SAT3": 43
+  },
+  "excluded": [
+    {
+      "case": "r0702",
+      "Q_i": -16.668,
+      "Q_e": 236.6,
+      "Gamma_e": 1.587,
+      "split": "train"
+    },
+    {
+      "case": "r2002",
+      "Q_i": -0.24137,
+      "Q_e": 31.994,
+      "Gamma_e": -0.012923,
+      "split": "train"
+    },
+    {
+      "case": "r2828",
+      "Q_i": -0.018705,
+      "Q_e": 6.8269,
+      "Gamma_e": -0.013826,
+      "split": "train"
+    },
+    {
+      "case": "r3565",
+      "Q_i": -1.6504,
+      "Q_e": 30.441,
+      "Gamma_e": 0.10281,
+      "split": "train"
+    }
+  ],
+  "validation": [
+    {
+      "model": "Small 32-32",
+      "parameters": 1539,
+      "mean_validation_nRMSE": 0.22662516821980183,
+      "best_epoch": 473.0,
+      "epochs_run": 543.0,
+      "training_seconds": 6.652036249999583
+    },
+    {
+      "model": "Medium 64-64",
+      "parameters": 5123,
+      "mean_validation_nRMSE": 0.22206295239911503,
+      "best_epoch": 272.0,
+      "epochs_run": 342.0,
+      "training_seconds": 5.076932582999689
+    },
+    {
+      "model": "Wide 128-128",
+      "parameters": 18435,
+      "mean_validation_nRMSE": 0.22622748401910384,
+      "best_epoch": 153.0,
+      "epochs_run": 223.0,
+      "training_seconds": 7.2348234589999265
+    },
+    {
+      "model": "Deep 64-64-64",
+      "parameters": 9283,
+      "mean_validation_nRMSE": 0.2042576918075589,
+      "best_epoch": 196.0,
+      "epochs_run": 266.0,
+      "training_seconds": 5.8022268340000664
+    },
+    {
+      "model": "Medium signed asinh",
+      "parameters": 5123,
+      "mean_validation_nRMSE": 0.22486189042051027,
+      "best_epoch": 303.0,
+      "epochs_run": 373.0,
+      "training_seconds": 5.329651250000097
+    },
+    {
+      "model": "Medium raw targets",
+      "parameters": 5123,
+      "mean_validation_nRMSE": 0.2258232548516257,
+      "best_epoch": 244.0,
+      "epochs_run": 314.0,
+      "training_seconds": 3.534957249999934
+    },
+    {
+      "model": "3-seed ensemble",
+      "parameters": 27849,
+      "mean_validation_nRMSE": 0.18897585327746144,
+      "best_epoch": null,
+      "epochs_run": null,
+      "training_seconds": 16.46419912500005
+    }
+  ],
+  "metrics": [
+    {
+      "dataset": "Random test",
+      "model": "Mean baseline",
+      "output": "Q_i",
+      "n": 750,
+      "RMSE": 76.53007928943755,
+      "R2": -0.00886578446781705,
+      "nRMSE": 0.865789873245678
+    },
+    {
+      "dataset": "Random test",
+      "model": "Mean baseline",
+      "output": "Q_e",
+      "n": 750,
+      "RMSE": 60.204693185358245,
+      "R2": -0.009514802492077479,
+      "nRMSE": 0.8290370424404437
+    },
+    {
+      "dataset": "Random test",
+      "model": "Mean baseline",
+      "output": "Gamma_e",
+      "n": 750,
+      "RMSE": 20.925490606660265,
+      "R2": -0.010937273760526223,
+      "nRMSE": 0.8267397396354973
+    },
+    {
+      "dataset": "Random test",
+      "model": "Selected NN",
+      "output": "Q_i",
+      "n": 750,
+      "RMSE": 17.125203302079132,
+      "R2": 0.9494826525655913,
+      "nRMSE": 0.19373856310978516
+    },
+    {
+      "dataset": "Random test",
+      "model": "Selected NN",
+      "output": "Q_e",
+      "n": 750,
+      "RMSE": 12.700440473262237,
+      "R2": 0.9550748471904822,
+      "nRMSE": 0.17488895052130116
+    },
+    {
+      "dataset": "Random test",
+      "model": "Selected NN",
+      "output": "Gamma_e",
+      "n": 750,
+      "RMSE": 3.4531113686288957,
+      "R2": 0.9724707688670761,
+      "nRMSE": 0.13642807461460338
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Mean baseline",
+      "output": "Q_i",
+      "n": 43,
+      "RMSE": 31.57938987955281,
+      "R2": -0.6683107508038182,
+      "nRMSE": 0.3572597364964107
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Mean baseline",
+      "output": "Q_e",
+      "n": 43,
+      "RMSE": 36.55314594885747,
+      "R2": -1.0478370459019448,
+      "nRMSE": 0.5033480017252971
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Mean baseline",
+      "output": "Gamma_e",
+      "n": 43,
+      "RMSE": 14.197695728164524,
+      "R2": -0.987368959421463,
+      "nRMSE": 0.5609330500471414
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Selected NN",
+      "output": "Q_i",
+      "n": 43,
+      "RMSE": 5.508623685656768,
+      "R2": 0.9492360171712185,
+      "nRMSE": 0.06231942586293856
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Selected NN",
+      "output": "Q_e",
+      "n": 43,
+      "RMSE": 3.042232384379923,
+      "R2": 0.9858149574001416,
+      "nRMSE": 0.04189247058527075
+    },
+    {
+      "dataset": "SAT3",
+      "model": "Selected NN",
+      "output": "Gamma_e",
+      "n": 43,
+      "RMSE": 0.6480807253863216,
+      "R2": 0.9958590404924716,
+      "nRMSE": 0.025604852007538433
+    }
+  ],
+  "timing": {
+    "selected_single_case_ms": 0.9770625,
+    "selected_batch_ms": 2.2583539999999998,
+    "selected_batch_ms_per_case": 0.0030111386666666663,
+    "baseline_single_case_ms": 0.001458,
+    "selected_model_training_seconds": 16.46419912500005,
+    "all_candidate_and_extra_seed_training_seconds": 44.29259991699928,
+    "cpu_threads": 1,
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64"
+  },
+  "versions": {
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "torch": "2.14.1",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2",
+    "IPython": "9.17.1"
+  },
+  "archive_sha256": {
+    "scan_db.tar": "2f22d98436ee102f84c6fd24d3182eac8f6124b61c474c898d685e71e580837d",
+    "SAT3_dataset.tar": "b867d6b60370b60531c12794683917a7533b9f7963f2896be74c5b7c8f3c0082"
+  },
+  "signed_checks": {
+    "Random test": {
+      "negative_particle_cases": 7,
+      "negative_particle_sign_correct": 3,
+      "negative_predicted_heat_values": 0
+    },
+    "SAT3": {
+      "negative_particle_cases": 2,
+      "negative_particle_sign_correct": 2,
+      "negative_predicted_heat_values": 0
+    }
+  },
+  "isotope_order_matches": 7,
+  "isotope_triplets": 8,
+  "temperature_cases": [
+    "b_D",
+    "c_D",
+    "a_D",
+    "d_D"
+  ],
+  "temperature_x": [
+    1.5,
+    2.25,
+    3.0,
+    3.5
+  ],
+  "temperature_truth": {
+    "Q_i": [
+      4.7995,
+      20.862,
+      43.101,
+      60.586
+    ],
+    "Q_e": [
+      2.2156,
+      7.7842,
+      15.258,
+      20.765
+    ],
+    "Gamma_e": [
+      0.74508,
+      1.3209,
+      1.8444,
+      1.8723
+    ]
+  },
+  "temperature_prediction": {
+    "Q_i": [
+      4.539592266082764,
+      22.02701759338379,
+      48.21803283691406,
+      60.49147415161133
+    ],
+    "Q_e": [
+      1.7529875040054321,
+      7.283944606781006,
+      17.064964294433594,
+      21.770727157592773
+    ],
+    "Gamma_e": [
+      0.48781171441078186,
+      1.508837342262268,
+      1.9852491617202759,
+      2.0872442722320557
+    ]
+  }
+}

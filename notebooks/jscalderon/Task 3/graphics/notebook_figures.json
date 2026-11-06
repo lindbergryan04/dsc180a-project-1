@@ -1,0 +1,20 @@
+[
+  {
+    "file": "notebook-cell-06-output-02.png",
+    "cell": 6,
+    "output": 2,
+    "source_excerpt": "def diagnostics(frame):\n    mean, lo, hi = predict(frame)\n    truth = frame[targets].to_numpy()\n    err, half = abs(mean - truth), (hi - lo) / 2\n    summary = pd.DataFrame({'MAE': err.mean(0), 'mean half-width': half.mean(0),\n                            'coverage': ((truth >= lo) & (truth <= hi)).mean(0)}, index=targets)\n    return summary, err, half\n\nbaseline, err, half = diagnostics(test)\nbaseli"
+  },
+  {
+    "file": "notebook-cell-12-output-02.png",
+    "cell": 12,
+    "output": 2,
+    "source_excerpt": "fractions = dict(RLTS_1=.10, RLTS_2=.10, RLNS_1=.10, TAUS_2=.10, XNUE=.20,\n                 Q_LOC=.05, Q_PRIME_LOC=.10)\nrng = np.random.default_rng(2026)\nn = 10_000\nstart = perf_counter()\nnominal = pd.DataFrame(np.tile(ref[features], (n,1)), columns=features)\ndraws = nominal.copy()\nfor feature, frac in fractions.items():\n    draws[feature] *= rng.uniform(1-frac, 1+frac, n)\nmc, _ = ensemble(draws)\n"
+  },
+  {
+    "file": "notebook-cell-20-output-01.png",
+    "cell": 20,
+    "output": 1,
+    "source_excerpt": "fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), sharey=True, constrained_layout=True)\nfor ax, domain in zip(axes, ['Test', 'Outside']):\n    table = metrics[metrics.domain == domain].pivot(index='flux', columns='model', values='MAE').loc[targets]\n    ratios = table.div(table['Baseline'], axis=0).drop(columns='Baseline')\n    ratios.plot.bar(ax=ax, rot=0)\n    ax.axhline(1, color='black', linestyle="
+  }
+]

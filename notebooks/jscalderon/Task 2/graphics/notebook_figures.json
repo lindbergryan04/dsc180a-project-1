@@ -1,0 +1,44 @@
+[
+  {
+    "file": "notebook-cell-06-output-01.png",
+    "cell": 6,
+    "output": 1,
+    "source_excerpt": "fig,axes=plt.subplots(3,4,figsize=(13,8))\nfor ax,name in zip(axes.flat,FEATURES):\n    ax.hist(scan_raw[name],bins=20,color='#285f82',edgecolor='white')\n    ax.set_title(name,fontsize=10);ax.set_ylabel('Cases')\naxes.flat[-1].axis('off');fig.suptitle('Randomly varied inputs before exclusions');fig.tight_layout()\nfig.savefig(OUT/'input_histograms.png',bbox_inches='tight');plt.show()\nfig,axes=plt.subp"
+  },
+  {
+    "file": "notebook-cell-06-output-02.png",
+    "cell": 6,
+    "output": 2,
+    "source_excerpt": "fig,axes=plt.subplots(3,4,figsize=(13,8))\nfor ax,name in zip(axes.flat,FEATURES):\n    ax.hist(scan_raw[name],bins=20,color='#285f82',edgecolor='white')\n    ax.set_title(name,fontsize=10);ax.set_ylabel('Cases')\naxes.flat[-1].axis('off');fig.suptitle('Randomly varied inputs before exclusions');fig.tight_layout()\nfig.savefig(OUT/'input_histograms.png',bbox_inches='tight');plt.show()\nfig,axes=plt.subp"
+  },
+  {
+    "file": "notebook-cell-10-output-02.png",
+    "cell": 10,
+    "output": 2,
+    "source_excerpt": "mean_flux=train[TARGETS].mean().to_numpy()\ndef metrics(y,p,dataset,model):\n    rmse=np.sqrt(np.mean((p-y)**2,axis=0))\n    r2=r2_score(y,p,multioutput='raw_values')\n    return [{'dataset':dataset,'model':model,'output':name,'n':len(y),\n             'RMSE':float(rmse[j]),'R2':float(r2[j]),'nRMSE':float(rmse[j]/train_scale[j])}\n            for j,name in enumerate(TARGETS)]\nmetric_rows=[];predictions="
+  },
+  {
+    "file": "notebook-cell-10-output-03.png",
+    "cell": 10,
+    "output": 3,
+    "source_excerpt": "mean_flux=train[TARGETS].mean().to_numpy()\ndef metrics(y,p,dataset,model):\n    rmse=np.sqrt(np.mean((p-y)**2,axis=0))\n    r2=r2_score(y,p,multioutput='raw_values')\n    return [{'dataset':dataset,'model':model,'output':name,'n':len(y),\n             'RMSE':float(rmse[j]),'R2':float(r2[j]),'nRMSE':float(rmse[j]/train_scale[j])}\n            for j,name in enumerate(TARGETS)]\nmetric_rows=[];predictions="
+  },
+  {
+    "file": "notebook-cell-12-output-02.png",
+    "cell": 12,
+    "output": 2,
+    "source_excerpt": "learning=[]\nsizes=[250,500,1000,2000,len(train)]\nfor rep in range(3):\n    ordering=np.random.default_rng(100+rep).permutation(len(train))\n    for n in sizes:\n        subset=train.iloc[ordering[:n]]\n        if n==len(train) and rep==0:\n            curve_members=selected_members\n        else:\n            curve_members=[train_model(best_single['config'],subset,seed=1000+rep*10+k)\n                    "
+  },
+  {
+    "file": "notebook-cell-16-output-03.png",
+    "cell": 16,
+    "output": 3,
+    "source_excerpt": "sat_pred=pd.DataFrame(predictions['SAT3'],index=sat.index,columns=TARGETS)\ncoverage=[]\nfor f in FEATURES:\n    low,high=train[f].min(),train[f].max();tol=.002*max(high-low,1e-6)\n    outside=(sat[f]<low-tol)|(sat[f]>high+tol)\n    coverage.append({'feature':f,'train_min':low,'train_max':high,'SAT3_min':sat[f].min(),\n                     'SAT3_max':sat[f].max(),'outside_observed_range_n':int(outside.s"
+  },
+  {
+    "file": "notebook-cell-16-output-04.png",
+    "cell": 16,
+    "output": 4,
+    "source_excerpt": "sat_pred=pd.DataFrame(predictions['SAT3'],index=sat.index,columns=TARGETS)\ncoverage=[]\nfor f in FEATURES:\n    low,high=train[f].min(),train[f].max();tol=.002*max(high-low,1e-6)\n    outside=(sat[f]<low-tol)|(sat[f]>high+tol)\n    coverage.append({'feature':f,'train_min':low,'train_max':high,'SAT3_min':sat[f].min(),\n                     'SAT3_max':sat[f].max(),'outside_observed_range_n':int(outside.s"
+  }
+]
