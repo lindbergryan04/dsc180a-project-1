@@ -29,7 +29,7 @@ Aryan Nath
 | Path | Contents |
 | --- | --- |
 | `src/` | Reserved for reusable data-processing, modeling, and evaluation code. |
-| `notebooks/` | Individual experiment notebooks; Ryan's current analyses and saved outputs are in `notebooks/ryan/`. |
+| `notebooks/` | Individual experiment notebooks for each member. |
 | `data/README.md` | Dataset descriptions, access instructions, file formats, and quality checks. |
 | `data/Task1_TGLF_SAT3_dataset/` | Task 1 SAT3 starter dataset. |
 | `data/Task2_TGLF_scan/` | Task 2 TGLF parameter-scan data. |
@@ -51,29 +51,61 @@ See [data/README.md](data/README.md) for data access and storage instructions.
 
 ## Environment
 
-The shared dependency specification is not complete. `requirements.txt` is
-currently a placeholder. Add the packages and versions used by the submitted
-experiments and document the Python version here before treating this setup
-as a reproducible environment.
+`requirements.txt` pins the packages used by the notebooks in `notebooks/sbhatnagar/`
+(Python 3.12.11, CPU torch). Other members' notebooks may need more packages.
 
-Create a local environment from the repository root:
+Create a local environment from the repository root (Python 3.12 required;
+3.12.11 is the version tested):
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
+python3.12 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
 ## Reproduce results
 
-The notebooks in `notebooks/ryan/` contain analysis and saved results used in
-the report. Reproduction from a fresh clone has not been verified. Some
-notebooks refer to helpers, model artifacts, and paths outside this repository.
+### Ryan's notebooks (`notebooks/ryan/`)
 
-Remaining work: include the required helpers or document how to obtain them,
-complete the dependency specification, configure data and artifact paths, and
-document the commands and execution order needed to reproduce the report's
-figures and tables.
+### Sweekrit's notebooks (`notebooks/sbhatnagar/`)
+
+Each task folder holds one notebook, its figures (`figures/`) and its
+intermediate CSVs (`data/`, committed to git).
+
+| Task | Notebook | Needs | Writes |
+| --- | --- | --- | --- |
+| `task1/` | `01_sat3_flux_analysis.ipynb` | Raw SAT3 dataset (see below) | `figures/`, `data/sat3_tglf_table.csv`, `data/sat3_experiments.csv` |
+| `task2/` | `01_scandb_prediction_training.ipynb` | Committed `data/scan_db_table.csv` and `data/sat3_table.csv` | `figures/` |
+| `task3/` | `01_ensemble_uncertainty.ipynb` | Committed `data/*_table.csv` (scan, out-of-range, DIII-D) | `figures/` |
+
+How to run:
+
+1. Start Jupyter from inside the task folder, for example
+   `cd notebooks/sbhatnagar/task2 && jupyter lab`. Paths are relative, and
+   `task1/` and `task2/` import `tglf_dataset.py` from their own folder.
+2. Run all cells from top to bottom. The tasks are independent, so any order works.
+3. Seeds are fixed (`RANDOM_STATE = 42`; ensemble seeds 42-46), torch runs on
+   one CPU thread with deterministic kernels, and XGBoost runs on one thread.
+   Results should match on any CPU. Training and prediction times (task 2,
+   Table 2 and Figure 2) depend on the machine.
+
+Tasks 2 and 3 run from a fresh clone with no extra downloads.
+
+Task 1 reads the raw SAT3 dataset, which is not in git (large; see
+[data/README.md](data/README.md) for the source). Put it at
+`notebooks/sbhatnagar/task1/data/SAT3_dataset/data/` or set the `SAT3_DIR`
+environment variable to its `data` folder before starting Jupyter:
+
+```sh
+export SAT3_DIR=/path/to/SAT3_dataset/data      # Windows PowerShell: $env:SAT3_DIR = "C:\path\to\SAT3_dataset\data"
+```
+
+Task 2 can also rebuild `data/sat3_table.csv` from the raw dataset (step 4.1)
+if you delete that CSV and set `SAT3_DIR`.
+
+### Joey's Notebooks (`/notebooks/`)
+
+### Aryan's Notebooks (`/notebooks/`)
 
 ## Report
 
@@ -96,3 +128,7 @@ locations and remaining group work.
 4. Commit and push your own contribution. The TA requires at least one push
    from every team member. Review the combined report before the group submits
    the report PDF and repository link to Gradescope.
+
+## AI Usage Report
+
+All details on how AI was used to assist in the process (for both code and text) is available in the [AI_USE.md](AI_USE.md).

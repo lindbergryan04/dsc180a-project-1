@@ -1,1 +1,14 @@
-# Add project dependencies with pinned versions as they are selected.
+# Tested with Python 3.12.11 (CPU torch). Install: python -m pip install -r requirements.txt
+numpy==2.5.4
+pandas==3.0.6
+scipy==1.18.1
+scikit-learn==1.9.1
+xgboost==3.4.1
+torch==2.14.1
+matplotlib==3.11.2
+seaborn==0.13.2
+joblib==1.6.0
+tqdm==4.70.1
+# to run the notebooks
+jupyterlab==4.6.4
+ipykernel==7.4.0
