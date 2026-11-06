@@ -103,7 +103,7 @@ export SAT3_DIR=/path/to/SAT3_dataset/data      # Windows PowerShell: $env:SAT3_
 Task 2 can also rebuild `data/sat3_table.csv` from the raw dataset (step 4.1)
 if you delete that CSV and set `SAT3_DIR`.
 
-### Joey's Notebooks (`/notebooks/`)
+### Joey's Notebooks (`/notebooks/jscalderon`)
 
 ### Aryan's Notebooks (`/notebooks/`)
 
