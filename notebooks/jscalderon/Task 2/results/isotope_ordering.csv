@@ -1,0 +1,9 @@
+case,TGLF_order,NN_order,ordering_matches
+a,"H,D,T","H,D,T",True
+b,"H,D,T","H,D,T",True
+c,"H,T,D","H,D,T",False
+d,"H,D,T","H,D,T",True
+e,"H,D,T","H,D,T",True
+f,"H,D,T","H,D,T",True
+j,"H,D,T","H,D,T",True
+x,"H,D,T","H,D,T",True
