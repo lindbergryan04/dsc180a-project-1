@@ -148,7 +148,88 @@ jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --Ex
 
 The Task 2 run replaces the saved files in its results directory. To check the existing results alone, run `python "$joey/Task 2/support/check_results.py"`.
 
-### Aryan's Notebooks (`/notebooks/`)
+### Aryan's Notebooks (`/notebooks/aryan/`)
+
+Each task folder holds one notebook. Figures and intermediate tables are
+written inline into the notebook (Tasks 1-3) or saved alongside it (Task 4's
+`cases.csv`); none of the four tasks write a `figures/` or `data/` folder.
+
+| Task | Notebook | Needs (raw data) | Produces |
+| --- | --- | --- | --- |
+| `task1/` | `01_sat3_parameter_scans.ipynb` | The 43-case SAT3 starter dataset, committed in this repo at `data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data/` | `plots/*.png` (7 parameter-scan figures) and `findings_summary.md`, both already in `task1/` (also reproducible by running `generate_plots.py` standalone) |
+| `task2/` | `01_tglf_surrogate_models.ipynb` | `scan_db` (5,000 TGLF cases) and the 43-case `SAT3_dataset`, both **outside this repo** (see Data path mapping) | Tuned `HistGradientBoostingRegressor` surrogates for $Q_i$, $Q_e$, $\Gamma_e$, saved to `tglf_surrogate_models.joblib`; inline tables/plots only, nothing else is written to disk |
+| `task3/` | `01_surrogate_uncertainty_quantification.ipynb` | `scan_db`, `scan_db_outside` (9 single-parameter out-of-distribution sweeps), and `data_d3d` (DIII-D reference case + 300 perturbed TGLF runs), all **outside this repo** | A 10-member bootstrap ensemble with validation-calibrated 90% prediction intervals, saved to `tglf_uncertainty_surrogate.joblib`; inline tables/plots only |
+| `task4/` | `01_diiid_tglf_database.ipynb` | `task4_d3d` (DIII-D discharge #128913 profile cases at 13 radii, plus the case-generation tooling), **outside this repo** | `cases.csv`: the 1,000 generated input cases, committed at `notebooks/aryan/task4/cases.csv`. `d3d_database.csv` (generated cases merged with their TGLF fluxes) is written **outside this repo** to `task4_d3d/d3d_database.csv`; as of the notebook's last run only 52 of the 1,000 TGLF simulations had finished, so that file currently has 52 rows, not 1,000 |
+
+**Model artifacts live outside the repo.** `tglf_surrogate_models.joblib`
+(Task 2, ~2.5 MB) and `tglf_uncertainty_surrogate.joblib` (Task 3, ~26 MB) are
+written to the notebook's working directory, which is the parent folder
+`.../DSC 180A/` that contains this repo clone as a subdirectory — not
+anywhere under `dsc180a-project-1/`. Neither file is committed to Git.
+
+#### Data path mapping
+
+Only Task 1 resolves its dataset through an
+environment-variable override (`SAT3_DATA_DIR`) plus a repo-relative fallback
+(`data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data/`), auto-detected from the
+notebook's own location. Tasks 2-4 instead use plain relative paths
+(`scan_db/data`, `SAT3_dataset/data`, `data_d3d/d3d_uq/data`,
+`task4_d3d/d3d_profile/...`, `task4_d3d/d3d_mydb_4/cases.csv`) with **no env
+var override**, and these paths currently resolve correctly only because
+`scan_db/`, `scan_db_outside/`, `data_d3d/`, `task4_d3d/`, and `SAT3_dataset/`
+already sit as siblings of this repo clone, directly inside
+`.../DSC 180A/` (outside the repo, matching `data/README.md`'s note that
+shared course data "can also remain outside the repository"). To reproduce
+Tasks 2-4 from a fresh clone, place or symlink those five directories next to
+(not inside) the cloned repo and start Jupyter from that parent folder, e.g.:
+
+```sh
+# from the folder that will contain the repo clone
+ln -s /path/to/scan_db scan_db
+ln -s /path/to/scan_db_outside scan_db_outside
+ln -s /path/to/data_d3d data_d3d
+ln -s /path/to/task4_d3d task4_d3d
+ln -s /path/to/SAT3_dataset SAT3_dataset
+cd dsc180a-project-1 && jupyter lab   # or: jupyter lab from the parent folder itself
+```
+
+Tasks 2 and 3 also `import parse_sat3`, a standalone parsing module with the
+same `load_all_cases()` function as `src/tglf_parser.py`. That module is
+**not currently copied into this repository**; it must be importable (for
+example, copied next to the notebook, or placed on `PYTHONPATH`) for those
+two notebooks to run from a fresh clone. Task 1 does not have this gap — its
+notebook imports `tglf_parser` directly from `src/` with automatic repo-root
+detection. Task 4 does not need either parser; it reads `cases.csv` and
+`out.tglf.gbflux` files directly.
+
+#### Reproduction commands
+
+Activate the environment as described above
+(`python3.12 -m venv .venv && source .venv/bin/activate && python -m pip install -r requirements.txt`).
+Task 2 additionally needs `xgboost`, already pinned in `requirements.txt`.
+
+```sh
+# Task 1: dataset already resolves from the repo, no extra setup needed
+cd notebooks/aryan/task1 && jupyter lab   # run 01_sat3_parameter_scans.ipynb top to bottom
+# optional override if the dataset lives somewhere else:
+export SAT3_DATA_DIR=/path/to/SAT3_dataset/data
+
+# Tasks 2-4: start Jupyter from the parent folder with the symlinks above in place
+cd "/path/to/DSC 180A"
+jupyter lab   # open and run notebooks/aryan/task{2,3,4}/*.ipynb top to bottom
+```
+
+Run all cells top to bottom; the four notebooks are independent of each
+other and can be run in any order. Seeds are fixed: Tasks 2 and 3 use a
+plain local variable `random_seed = 42` (not an exported constant) for the
+70%/15%/15% `scan_db` train/validation/test split, the
+`HistGradientBoostingRegressor` fits, and (Task 3) the bootstrap resampling
+RNG. Task 4's 1,000-case generation uses `SEED = 4`, but that constant lives
+in the external generation script (`task4_d3d/tools/make_db.py`, outside
+this repo) that produced the committed `cases.csv`, not in the notebook
+itself — the notebook only reads the already-generated `cases.csv`. Results
+should match on any CPU; training and prediction times depend on the
+machine.
 
 ## Report
 

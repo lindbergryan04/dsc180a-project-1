@@ -163,6 +163,54 @@ DIII-D reference condition. These serve as evaluation cases in the uncertainty
 study; they are distinct from the new DIII-D training database described in
 the remaining work.
 
+Each of the nine \texttt{scan\_db\_outside} groups sweeps exactly one input
+strictly beyond the range it was sampled from in \texttt{scan\_db}, while
+holding every other input inside its nominal training range
+(Table~\ref{tab:ood-sweeps}). This design isolates extrapolation along one
+coordinate at a time instead of the joint extrapolation that an arbitrary new
+input vector could produce.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{llll}
+    \toprule
+    Group                      & Varied input          & Training range & Outside range \\
+    \midrule
+    \texttt{ood\_RLTS\_1}      & $R/L_{Te}$             & 1.5--3.5        & 3.5--5.0       \\
+    \texttt{ood\_RLTS\_2}      & $R/L_{Ti}$             & 1.5--3.5        & 3.5--5.0       \\
+    \texttt{ood\_RLN}          & $R/L_{n}$              & 1.0--3.0        & 3.0--4.5       \\
+    \texttt{ood\_TAUS\_2}      & $T_i/T_e$              & 0.5--1.5        & 1.5--2.5       \\
+    \texttt{ood\_XNUE}         & $\nu_{ei}$             & 0.01--1.0       & 1.0--5.0       \\
+    \texttt{ood\_Q\_LOC}       & $q$                    & 1.5--2.5        & 2.5--4.0       \\
+    \texttt{ood\_KAPPA\_LOC}   & $\kappa$               & 1.0--2.0        & 2.0--2.5       \\
+    \texttt{ood\_DRMAJDX\_LOC} & $\Delta'$              & $-0.5$--0.0     & $-0.75$--$-0.5$ \\
+    \texttt{ood\_RMIN\_LOC}    & $r/a$                  & 0.25--0.75      & 0.75--0.90     \\
+    \bottomrule
+  \end{tabular}
+  \caption{The nine \texttt{scan\_db\_outside} single-parameter
+    out-of-distribution sweeps. Each group varies only the listed input beyond
+    its \texttt{scan\_db} training range, holding the remaining ten inputs
+    inside their nominal ranges.}
+  \label{tab:ood-sweeps}
+\end{table}
+
+A separate 1,000-case DIII-D database was also generated, independent of
+\texttt{data\_d3d}, following the mentor-prescribed recipe with a
+member-specific seed of 4. Cases are distributed evenly across the 13
+supplied radii ($r/a = 0.20$ to $0.80$). At each radius, five inputs are
+perturbed from the supplied baseline profile by independently sampled
+multiplicative factors: $a/L_{Te}$ and $a/L_{Ti}$ each by a separately drawn
+factor in $[0.6, 1.4]$, the shared density-gradient scale $a/L_n$
+(applied equally to both species) by a factor in $[0.6, 1.4]$, the
+temperature ratio $T_i/T_e$ by a factor in $[0.75, 1.25]$, and the collision
+frequency $\nu_{ei}$ by a factor in $[0.5, 2.0]$ drawn uniformly on a
+$\log_{10}$ scale. All magnetic geometry parameters are held fixed at the
+exact DIII-D equilibrium values for that radius. As of this checkpoint, TGLF
+had completed 52 of the 1,000 generated cases; the remaining simulations were
+still running at submission time, so this database is not yet used for
+training.
+
 \subsection{Summary of Findings and Report Roadmap}
 
 On the 43 starter scans, greater model flexibility did not consistently
@@ -498,6 +546,63 @@ guarantee. These results are reported separately from the five-network
 activation comparison and do not measure the effect of increasing ensemble size.
 The results are in Section~\ref{sec:disagreement-results}.
 
+\subsection{Gradient-Boosted Histogram-Tree Surrogate and Bootstrap Prediction Intervals}
+\label{sec:gbdt-methods}
+
+As an independent, non-neural-network surrogate family on \texttt{scan\_db},
+we trained \texttt{scikit-learn}'s \texttt{HistGradientBoostingRegressor} for
+each of $Q_i$, $Q_e$, and $\Gamma_e$. Gradient boosting builds an additive
+model $F_M(\mathbf{x}) = \sum_{m=1}^{M} \eta\, h_m(\mathbf{x})$ by fitting each
+successive weak learner $h_m$ to the negative gradient of the loss with
+respect to the current ensemble output \citep{friedman2001}. For squared-error
+loss, this pseudo-residual at boosting round $m$ is the ordinary residual,
+$r_i^{(m)} = y_i - F_{m-1}(\mathbf{x}_i)$, and $h_m$ is a regression tree fit
+to $\{(\mathbf{x}_i, r_i^{(m)})\}$. The learning rate $\eta$ shrinks each
+tree's contribution before it is added to the ensemble. The
+\emph{histogram} variant discretizes each continuous feature into at most 256
+bins before growing each tree, accumulating per-bin gradient and Hessian sums
+so that the best split at a node is found by scanning bin boundaries rather
+than every unique training value, following the binning strategy introduced
+for gradient boosting by \citet{ke2017lightgbm}. This reduces split-finding
+cost per node from $O(n\log n)$ to $O(n_{\text{bins}})$ and lets each of our
+three single-target models fit on the 3,497 training cases in 1--2 seconds.
+Each model used the 11 inputs from Section~\ref{sec:methods} (unmodified,
+without the engineered magnetic-shear substitution) and $\log_{10}(\mathtt{XNUE})$,
+predicting the raw, untransformed flux. Hyperparameters (learning rate,
+maximum leaf nodes per tree, and minimum samples per leaf) were selected by a
+grid search scored on the validation partition, with early stopping on a
+held-out fraction of the training rounds.
+
+To attach a prediction interval to this surrogate family, we trained a
+10-member bootstrap ensemble per target: for $m = 1, \dots, 10$, a
+histogram-gradient-boosting model with fixed hyperparameters was fit to a
+resample (with replacement, same size as the training set) of the 3,497
+training cases, using a distinct seed for each member. For an input vector
+$\mathbf{x}$, the ensemble mean $\bar{y}(\mathbf{x}) = \frac{1}{M}\sum_{m=1}^{M}
+\hat{y}^{(m)}(\mathbf{x})$ is the point prediction, and the sample standard
+deviation
+$s(\mathbf{x}) = \sqrt{\frac{1}{M-1}\sum_{m=1}^{M}(\hat{y}^{(m)}(\mathbf{x}) -
+  \bar{y}(\mathbf{x}))^2}$
+quantifies epistemic spread across the bootstrap resamples. Because this raw
+spread need not give honest coverage, we calibrated it on the validation
+partition: for each validation case $i$ we computed the normalized residual
+$z_i = |y_i - \bar{y}(\mathbf{x}_i)| / \max(s(\mathbf{x}_i), 10^{-4})$, and
+took $c_{0.90}$, the empirical 90th percentile of $\{z_i\}$, as a per-target
+scaling factor. The resulting calibrated 90\% prediction interval for a new
+query $\mathbf{x}$ is $[\bar{y}(\mathbf{x}) - c_{0.90}\,s(\mathbf{x}),\
+\bar{y}(\mathbf{x}) + c_{0.90}\,s(\mathbf{x})]$. The fitted multipliers were
+$c_{0.90} = 2.616$ for $Q_i$, $2.721$ for $Q_e$, and $2.631$ for $\Gamma_e$,
+each several times larger than the nominal Gaussian value of 1.645, meaning
+the raw bootstrap spread alone would have substantially under-covered the
+validation targets. This is a separate experiment from the quantile and
+15-network ensembles in Sections~\ref{sec:interval-methods}
+and~\ref{sec:disagreement-methods}: it trains different model families on an
+independently drawn 70\%/15\%/15\% split of the same \texttt{scan\_db} data
+(3,497 training, 749 validation, and 750 test cases after removing the same
+four negative-$Q_i$ cases), so its coverage and error figures should not be
+pooled with those of the neural-network ensembles. Results are in
+Sections~\ref{sec:gbdt-results} and~\ref{sec:gbdt-uncertainty-results}.
+
 \section{Accuracy Results}
 \label{sec:accuracy-results}
 \subsection{Starter-Scan Comparison: Flexibility and Failure Modes}
@@ -747,6 +852,60 @@ TGLF-to-surrogate speedup ratio.
   and particle flux. These checks show why an overall score should be read
   alongside local trends and failure cases.
 \end{samepage}
+
+\subsection{Gradient-Boosted Surrogate on \texttt{scan\_db}: Accuracy and Speed}
+\label{sec:gbdt-results}
+
+Table~\ref{tab:gbdt-test} reports the tuned \texttt{HistGradientBoostingRegressor}
+surrogate from Section~\ref{sec:gbdt-methods} on its own 750-case
+\texttt{scan\_db} test partition, alongside the mean and ridge baselines
+fit on the same split. We report this as a separate table rather than adding
+rows to Table~\ref{tab:starter} or Table~\ref{tab:test}: Table~\ref{tab:starter}
+scores a different dataset (the 43 starter cases) and metric (letter-grouped
+MAE), and Table~\ref{tab:test} is captioned as the same 750 test cases used to
+select the five-network ensemble's activation function, whereas this
+surrogate used its own independently drawn split of \texttt{scan\_db}, so its
+750 test cases are not the same rows. The gradient-boosted surrogate reduced
+test RMSE relative to its ridge baseline by 43.5\% for $Q_i$, 38.6\% for
+$Q_e$, and 53.6\% for $\Gamma_e$, broadly consistent in direction with the
+larger reductions reported for the five-network ensemble in
+Section~\ref{sec:ensemble-results}, though the two are not evaluated on the
+same split and should not be compared as if they were.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lrrrrrr}
+    \toprule
+                   & \multicolumn{3}{c}{RMSE} & \multicolumn{3}{c}{$R^2$}                                                 \\
+    \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+    Model          & $Q_i$                    & $Q_e$                     & $\Gamma_e$ & $Q_i$  & $Q_e$  & $\Gamma_e$ \\
+    \midrule
+    Mean           & 89.64                    & 62.41                     & 22.81      & $-0.000$ & $-0.002$ & $-0.002$ \\
+    Ridge          & 62.31                    & 42.00                     & 15.74      & 0.517  & 0.546  & 0.523      \\
+    GB surrogate   & 35.20                    & 25.80                     & 7.30       & 0.846  & 0.829  & 0.897      \\
+    \bottomrule
+  \end{tabular}
+  \caption{Test-set performance of the tuned \texttt{HistGradientBoostingRegressor}
+    surrogate (learning rate 0.08, 31 maximum leaf nodes, minimum leaf size
+    10) and its baselines on 750 \texttt{scan\_db} test cases, a different
+    split from Table~\ref{tab:test}. RMSE is in gyro-Bohm units.}
+  \label{tab:gbdt-test}
+\end{table}
+
+Training each single-target model (300 boosting rounds with early stopping,
+3,497 training cases) took 1.18\,s for $Q_i$, 1.69\,s for $Q_e$, and 1.26\,s
+for $\Gamma_e$ on a single CPU core. Per-case prediction latency, measured by
+repeating a 750-case batch call 100 times and dividing by the total number of
+evaluations, was 12\,$\mu$s for $Q_i$, 15\,$\mu$s for $Q_e$, and 12\,$\mu$s for
+$\Gamma_e$ --- roughly five orders of magnitude faster than the 3-second
+per-case TGLF runtime assumed for this comparison, giving speedup factors of
+about $2.4\times10^5$, $2.0\times10^5$, and $2.5\times10^5$, respectively.
+These timings measure batched, amortized per-case cost rather than isolated
+single-case calls, so they are not directly comparable to the single-call
+latency reported for the five-network ensemble in
+Section~\ref{sec:learning-results}.
 
 \section{Uncertainty and Out-of-Range Results}
 \label{sec:uncertainty-results}
@@ -1025,6 +1184,96 @@ quantile ensemble, despite 100\% interval coverage. The average interval width
 was 3.85 in gyro-Bohm units. Broad intervals can contain the reference values
 while the central prediction stays biased. The cause of this local bias has not
 been established.
+
+\subsection{Gradient-Boosted Bootstrap Ensemble: Coverage, Extrapolation, and DIII-D Propagation}
+\label{sec:gbdt-uncertainty-results}
+
+This subsection reports the 10-member bootstrap ensemble over the
+gradient-boosted histogram-tree surrogate (Section~\ref{sec:gbdt-methods}), a
+third, separately calibrated interval method evaluated on its own
+\texttt{scan\_db} split (Section~\ref{sec:gbdt-results}).
+
+On its 750 in-distribution test cases, the calibrated 90\% interval's
+empirical coverage was 91.20\% for $Q_i$, 87.87\% for $Q_e$, and 86.80\% for
+$\Gamma_e$ against a nominal target of 90\%, close to nominal for $Q_i$ but a
+few points low for $Q_e$ and $\Gamma_e$. Predicted uncertainty correlated
+positively with absolute error (Pearson $r = 0.662$, $0.611$, and $0.683$ for
+$Q_i$, $Q_e$, and $\Gamma_e$), so wider bootstrap spread does track larger
+error on held-out in-distribution cases, with the same caveat as
+Section~\ref{sec:width-results} that this is a loose, not precise,
+relationship.
+
+We then evaluated the same ensemble, without retraining, on the nine
+\texttt{scan\_db\_outside} sweeps described in
+Section~\ref{sec:accuracy-results} and Table~\ref{tab:ood-sweeps}. Error grew
+in eight of the nine groups relative to the matched in-distribution test
+error, with the largest growth for $Q_i$ under \texttt{ood\_RLTS\_2}
+($R/L_{Ti}$ swept to 3.5--5.0; mean absolute error rose from 16.80 to 83.94,
+a 5.00$\times$ increase) and for $\Gamma_e$ under \texttt{ood\_RLN}
+($R/L_n$ swept to 3.0--4.5; a 6.76$\times$ increase). The sole exception was
+\texttt{ood\_XNUE}, where error fell below the in-distribution value for all
+three fluxes, consistent with high collisionality suppressing trapped-electron-mode
+and drift-wave turbulence toward zero transport. Ensemble spread grew in the
+same direction but by much less than the error: for example, under
+\texttt{ood\_RLTS\_2} the $Q_i$ error ratio was 5.00 while the corresponding
+standard-deviation ratio was only 1.75. This mismatch has a structural cause.
+Because decision trees partition the input space using axis-aligned cuts at
+the training data's boundaries, a tree ensemble's predictions extrapolate as
+piecewise-constant functions once a query falls outside the training bounding
+box: every member keeps returning the value of whichever boundary leaf the
+query lands in, so bootstrap resampling changes which leaf is selected far
+less than it would change the true, unbounded physical flux. As a direct
+consequence, calibrated 90\% coverage degraded substantially under
+extrapolation, falling to 53.3\% for $Q_i$ under \texttt{ood\_RLTS\_2} and to
+66.7\% for $Q_i$ and $\Gamma_e$ under \texttt{ood\_DRMAJDX\_LOC} ($\Delta'$
+swept to $-0.75$--$-0.5$), the two lowest values among the 27 group-by-flux
+combinations. The error bars widen on these out-of-range inputs, giving a
+weak signal of elevated risk, but not enough to flag that the predictions
+have become unreliable.
+
+Finally, we propagated the same DIII-D reference-case input error bars used
+in Section~\ref{sec:d3d-results} through this ensemble with a 10,000-draw
+Monte Carlo sample, evaluated in 0.876\,s total (87.6\,$\mu$s per draw,
+about 11,400 draws per second on one CPU core). The resulting $Q_i$
+distribution had mean 3.56 and standard deviation 1.56 (a 43.7\% relative
+spread, 90\% range $[1.20, 6.33]$); $Q_e$ had mean 5.21 and standard
+deviation 1.08 (20.8\% relative spread, range $[3.46, 7.05]$); and $\Gamma_e$
+had mean 0.55 and standard deviation 0.20 (35.5\% relative spread, range
+$[0.24, 0.88]$). Measured against the 300 ground-truth TGLF runs at the same
+input error bars, the surrogate's point predictions correlated well with TGLF
+($r = 0.891$, $0.687$, and $0.742$ for $Q_i$, $Q_e$, and $\Gamma_e$), and the
+calibrated 90\% interval around the matched 300-case predictions contained
+the TGLF value in 100.0\%, 99.7\%, and 99.7\% of cases, wider than the
+nominal 90\% target. A single-input sensitivity sweep, varying one input at a
+time within its own error bar while holding the rest at the exact reference
+values (Table~\ref{tab:gbdt-d3d-sensitivity}), shows that the dominant driver
+differs by flux: $R/L_{Ti}$ (\texttt{RLTS\_2}) dominates the $Q_i$ spread,
+collisionality $\nu_{ei}$ (\texttt{XNUE}) dominates the $Q_e$ spread, and the
+density gradient $R/L_n$ (\texttt{RLNS}) dominates the $\Gamma_e$ spread.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{lrrr}
+    \toprule
+    Varied input (error bar)     & Std($Q_i$) & Std($Q_e$) & Std($\Gamma_e$) \\
+    \midrule
+    \texttt{RLTS\_1} ($\pm$10\%) & 0.228      & 0.532      & 0.083           \\
+    \texttt{RLTS\_2} ($\pm$10\%) & 1.191      & 0.365      & 0.071           \\
+    \texttt{RLNS} ($\pm$10\%)    & 0.146      & 0.443      & 0.137           \\
+    \texttt{TAUS\_2} ($\pm$10\%) & 0.401      & 0.154      & 0.019           \\
+    \texttt{XNUE} ($\pm$20\%)    & 0.752      & 0.651      & 0.024           \\
+    \texttt{Q\_LOC} ($\pm$5\%)   & 0.289      & 0.325      & 0.093           \\
+    \texttt{Q\_PRIME\_LOC} ($\pm$10\%) & 0.132 & 0.095     & 0.025           \\
+    \bottomrule
+  \end{tabular}
+  \caption{Standard deviation induced in each flux (gyro-Bohm units) when a
+    single DIII-D input is varied within its own measurement error bar
+    (5,000 draws), holding all other inputs at their exact reference values.
+    The largest entry in each column is the dominant single-input driver for
+    that flux.}
+  \label{tab:gbdt-d3d-sensitivity}
+\end{table}
 
 \section{Discussion, Limitations, and Remaining Work}
 \label{sec:discussion}
