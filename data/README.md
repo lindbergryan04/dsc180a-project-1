@@ -144,15 +144,15 @@ of exclusions. Inspect zero heat fluxes before applying logarithms. Particle
 flux can be positive or negative, so a negative `Gamma_e` alone is not grounds
 for removing a case.
 
-Task 1 names its parsed output `sat3_tglf_table.csv`; store it under
-`data/processed/`. Preserve train, validation, and test membership with the
+Ryan's Task 1 command writes `sat3_tglf_table.csv` under `notebooks/ryan/runs/task1/`.
+Preserve train, validation, and test membership with the
 processed data. Task 2 specifies a fixed-seed 70%/15%/15% split for `scan_db`;
 Task 3 reuses that split. Keep the SAT3 cases separate from `scan_db` training
 and validation.
 
-This repository currently contains the data documentation and task materials.
-The loading and database-generation scripts have not yet been added, so there
-is no repository command to reproduce the derived tables yet.
+The [root README](../README.md) gives the commands for Ryan’s analysis and the
+setup for Sweekrit’s notebooks. Ryan’s commands read these raw task directories
+and write derived tables, trained models, and figures under `notebooks/ryan/runs/`.
 
 ## Project references
 

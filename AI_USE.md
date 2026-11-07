@@ -15,10 +15,11 @@ This document describes how AI tools were used in this project, and where they w
 | Grammar and wording in the report | Yes |
 | Debugging code | Yes |
 | Structure (layout and headings) of documentation files such as `README.md`, `AI_USE.md`, and markdowns in Jupyter Notebooks | Yes |
-| Model ideation and implementation | **No** |
+| Model ideation | **No** |
+| Model implementation | **Yes** |
 | Choosing which graphs to make and what they analyze | **No** |
 | Interpreting figures and deciding what to report | **No** |
-| Content of documentation files | **No** |
+| Content of documentation files | **Yes** |
 
 ## Where AI was used
 
@@ -56,19 +57,21 @@ When code raised errors or behaved unexpectedly, we used AI to help diagnose the
 
 > *Example prompt:* "I'm getting `ValueError: Found input variables with inconsistent numbers of samples` when fitting this model. Here is the traceback and the relevant code. What's causing it?"
 
-### 7. Structure of documentation files
-AI was used to generate the structure of files such as `README.md` and `AI_USE.md`: the section layout, headings, and formatting. All content placed in those files was written by us and verified by us.
+### 7. Structure and content of documentation files
+AI helped organize sections, headings, and formatting in files such as `README.md` and `AI_USE.md`. We also used AI to draft some of the text.
 
 > *Example prompt:* "Draft a structure for an AI_USE.md that lists where AI was and was not used in a data science project, with example prompts."
 
 > *Example prompt:* "I have written this function that defines a pipeline for a Random Forest model and tests it on the training and validation datasets provided. Can you provide a short title and description for the Jupyter Notebook to make it easier to understand?"
 
+### 8. Model implementation
+We used AI to help write code for the models and architectures we chose.
+
 ## Where AI was not used
 
-- **Model ideation and implementation.** The choice of models, features, and approach, and the code that implements them, are our own work. This includes the extensive testing of the MLP, XGBoost, and Random Forest models, as well as the testing of the various ensemble neural network arrchitectures.
+- **Model ideation.** We chose the models, features, and architectures to test, including MLPs, XGBoost, random forests, and neural network ensembles.
 - **Choosing the graphs and their purpose.** We decided which visualizations to produce and what question each one should answer. This meant that we independently verified each result that was produced by our code and determined which ones were key to include into our report.
 - **Interpreting results.** We analyzed the resulting figures ourselves and decided what findings belong in the report. AI did not draw the conclusions. Our process was: we looked at each figure, wrote out our own interpretation as complete-sentence bullet points, and then asked AI to join those bullets into paragraphs (adding transitions and connecting words). AI also sometimes asked clarifying questions about our points, which we answered ourselves. It did not add findings, claims, or explanations that were not in our bullets.
-- **Content of documentation files.** AI provided the structure of `README.md` and `AI_USE.md`, but the text in them was written by humans.
 
 ## Verification
 
@@ -76,4 +79,4 @@ We read and tested all AI-assisted output before using it.
 
 - **Code.** Every AI-suggested code change was tested by us. We worked primarily in Jupyter Notebooks, so each change was executed in a cell right away. We compared the output against the results we expected and fixed anything that did not match before moving on. No AI-suggested code was kept without being run.
 - **Text.** We reviewed every wording edit to make sure it preserved our intended meaning.
-- **Documentation.** The content of the documentation files was written and verified by us.
+- **Documentation.** We reviewed the AI-assisted documentation for accuracy.

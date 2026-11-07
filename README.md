@@ -13,6 +13,8 @@ predictions under the available data and computational constraints. We assess
 prediction error, computational cost, and behavior across plasma conditions.
 Uncertainty is part of evaluation, and DIII-D is a case study within the project.
 
+We chose the models and architectures, selected the visualizations, and interpreted the results. We used AI to help implement the models and write project documentation. See [AI_USE.md](AI_USE.md) for details.
+
 ## Mentors:
 Igor Sfiligoi (SDSC)
 Emily Belli (GA)
@@ -39,7 +41,7 @@ Aryan Nath
 | `references/` | Research papers used for background and related work. |
 | `tasks/` | Mentor-provided instructions for Tasks 1–4. |
 | `report/` | Checkpoint report source and PDF, references, figures, review notes, and the original course template. |
-| `requirements.txt` | Python dependency list, to be populated as code is added. |
+| `requirements.txt` | Pinned Python dependencies for the project. |
 | `.gitignore` | Excludes datasets, local environments, credentials, and generated build files. |
 
 Dataset files under `data/` are stored locally and excluded from Git; only
@@ -51,11 +53,10 @@ See [data/README.md](data/README.md) for data access and storage instructions.
 
 ## Environment
 
-`requirements.txt` pins the packages used by the notebooks in `notebooks/sbhatnagar/`
-(Python 3.12.11, CPU torch). Other members' notebooks may need more packages.
+`requirements.txt` pins the scientific packages used by Ryan and Sweekrit.
+Both used CPU PyTorch. Sweekrit ran Python 3.12.11 and Ryan ran Python 3.12.12.
 
-Create a local environment from the repository root (Python 3.12 required;
-3.12.11 is the version tested):
+Create a Python 3.12 environment from the repository root.
 
 ```sh
 python3.12 -m venv .venv
@@ -66,6 +67,23 @@ python -m pip install -r requirements.txt
 ## Reproduce results
 
 ### Ryan's notebooks (`notebooks/ryan/`)
+
+Ryan’s notebooks contain the exploratory analyses and their saved outputs. To rebuild the reported experiments from the course data, run the commands below from the repository root with the environment above.
+
+Extract the course archives into their respective task directories as described in [data/README.md](data/README.md). Then run the three tasks in order.
+
+```sh
+sat3=data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data
+scan=data/Task2_TGLF_scan/scan_db/data
+uq=data/Task3_TGLF_Uncertainty
+runs=notebooks/ryan/runs
+
+python notebooks/ryan/task1/starter.py --sat3-data "$sat3" --output "$runs/task1"
+python notebooks/ryan/task2/scan.py --scan-data "$scan" --sat3-data "$sat3" --activations --learning-curves --output "$runs/task2"
+python notebooks/ryan/task3/task3_workflow.py --task2 "$runs/task2" --data "$uq" --output "$runs/task3"
+```
+
+Task 1 compares the starter models on 43 cases. Task 2 builds the data splits, trains the baselines and five-network ensemble, and evaluates the activation settings and learning curves. Task 3 uses the Task 2 models and trains ten additional members for the uncertainty analysis. For another training run, set `runs` to a fresh directory. Training times and numerical results can vary with the CPU and software environment.
 
 ### Sweekrit's notebooks (`notebooks/sbhatnagar/`)
 
@@ -128,7 +146,3 @@ locations and remaining group work.
 4. Commit and push your own contribution. The TA requires at least one push
    from every team member. Review the combined report before the group submits
    the report PDF and repository link to Gradescope.
-
-## AI Usage Report
-
-All details on how AI was used to assist in the process (for both code and text) is available in the [AI_USE.md](AI_USE.md).

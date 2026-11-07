@@ -1,4 +1,4 @@
-"""One question per figure for A3; fitting and calibration stay in a3_workflow."""
+"""One question per figure for Task 3; fitting and calibration stay in task3_workflow."""
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 import numpy as np
 
-from a3_workflow import TARGETS, OOD_SETS, INPUT_FRACTIONS, bounds
+from task3_workflow import TARGETS, OOD_SETS, INPUT_FRACTIONS, bounds
 
 BLUE = "#17658A"
 ORANGE = "#C55A28"
@@ -49,7 +49,7 @@ def calibration_figure(prediction, truth, calibration, output_dir=None):
     target = 100 * (1 - calibration["alpha"])
     fig, ax = plt.subplots(figsize=(9.6, 5.1))
     fig.subplots_adjust(left=.10, right=.97, bottom=.15, top=.70)
-    _heading(fig, "Calibration makes the error bars wide enough",
+    _heading(fig, "Validation coverage before and after interval calibration",
              f"How often do the intervals contain the TGLF answer? All {len(truth):,} validation cases.")
     x = np.arange(3)
     for offset, values, color, label in [(-.18, before, PALE, "Before: one SD (with floor)"),
@@ -132,7 +132,7 @@ def ood_figure(ood_metrics, output_dir=None):
              "Geometry (DRMAJDX_LOC)", "Minor radius"]
     fig, axes = plt.subplots(1, 3, figsize=(13, 5.5), sharey=True)
     fig.subplots_adjust(left=.235, right=.98, bottom=.15, top=.74, wspace=.18)
-    _heading(fig, "90% coverage does not hold for every unfamiliar input",
+    _heading(fig, "Prediction interval coverage outside the training range",
              "Each row changes one input beyond its training range. Dashed line: 90% target.")
     for ax, target in zip(axes, TARGETS):
         part = ood_metrics.loc[ood_metrics.target.eq(target)].set_index("dataset").loc[OOD_SETS]
@@ -161,7 +161,7 @@ def forward_figure(mc_prediction, paired, truth, output_dir=None):
     """Compare output distributions with one histogram panel per flux."""
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.1))
     fig.subplots_adjust(left=.065, right=.985, bottom=.16, top=.70, wspace=.25)
-    _heading(fig, "The surrogate predicts too much particle flux",
+    _heading(fig, "DIII-D flux distributions as the inputs vary",
              "Output distributions as the DIII-D inputs vary within their stated uncertainty.")
     mean_bias = []
     for j, (ax, target) in enumerate(zip(axes, TARGETS)):
@@ -181,8 +181,8 @@ def forward_figure(mc_prediction, paired, truth, output_dir=None):
                loc="upper center", bbox_to_anchor=(.52, .84), ncol=2, frameon=False)
     caption = (
         "**Figure 4. Compare the location, width, and shape of the distributions.** "
-        "The particle-flux predictions are shifted above TGLF. On the exact same 300 inputs, the "
-        f"surrogate's mean is **{mean_bias[2]:+.0f}%** above TGLF for particle flux "
+        "On the same 300 inputs, the predicted mean particle flux differs from the TGLF mean "
+        f"by **{mean_bias[2]:+.0f}%** "
         f"(ion heat: {mean_bias[0]:+.1f}%; electron heat: {mean_bias[1]:+.1f}%). "
         "This spread comes from varying the inputs; it is different from the prediction intervals in Figure 2."
     )
