@@ -87,5 +87,5 @@ notebooks/**/data_d3d/
 *.synctex*
 *-blx.bib
 
-# Output of compiling the course template (the template's own PDF stays tracked)
+# Local build output from the course template source
 report/DSC_Capstone_LaTeX_Template/report.pdf

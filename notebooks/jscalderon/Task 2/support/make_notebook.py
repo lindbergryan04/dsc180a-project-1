@@ -13,12 +13,17 @@ This notebook builds on the two supplied groupmate presentations. Their model-fa
 
 We compare network size, depth and target transformations, then compare the best single network with a three-seed ensemble using **validation data only**. The random test split and 43 SAT3 cases are used only after the choice is frozen. All reported flux errors are in the original gyro-Bohm units, after inverse transformation.
 
-**Run:** put this notebook beside `scan_db.tar`, with `SAT3_dataset.tar` in the parent folder (or edit the two paths below). Run all cells in order. Python 3.12 with numpy, pandas, torch, scikit-learn, matplotlib and IPython is required. The optional `.packages` folder contains the local environment used here. Exact versions are recorded at the end. Training uses one CPU thread and can take several minutes. The notebook writes tables, figures, predictions and model weights to `results/`.
+**Run:** place the original course archives in the shared `data/` directories described in the [project README](../../../README.md). Run the cells in order using Joey's Python 3.12 environment. Training uses one CPU thread. This notebook writes tables, figures, predictions and model weights to its `results/` directory.
 ''')
 code('''
 from pathlib import Path
-import os, sys, json, time, copy, tarfile, hashlib, platform, importlib.metadata
-ROOT = Path.cwd() if (Path.cwd() / 'scan_db.tar').exists() else Path.cwd() / 'task2'
+import os, sys, json, time, copy, gzip, tarfile, hashlib, platform, importlib.metadata
+REPO = next((p for p in (Path.cwd(), *Path.cwd().parents)
+             if (p / 'notebooks/jscalderon').is_dir() and (p / 'data/README.md').is_file()), None)
+if REPO is None:
+    raise FileNotFoundError('Start Jupyter from the project repository or a directory inside it.')
+DATA = REPO / 'data'
+ROOT = REPO / 'notebooks/jscalderon/Task 2'
 if (ROOT / '.packages').exists():
     sys.path.insert(0, str(ROOT / '.packages'))
 os.environ.setdefault('MPLCONFIGDIR', str(ROOT / '.build' / 'mpl'))
@@ -34,8 +39,8 @@ from IPython.display import display
 torch.set_num_threads(1)
 torch.use_deterministic_algorithms(True)
 plt.rcParams.update({'figure.dpi':120, 'axes.spines.top':False, 'axes.spines.right':False})
-SCAN_ARCHIVE = ROOT / 'scan_db.tar'
-SAT3_ARCHIVE = ROOT.parent / 'SAT3_dataset.tar'
+SCAN_ARCHIVE = DATA / 'Task2_TGLF_scan/scan_db.tar.gz'
+SAT3_ARCHIVE = DATA / 'Task1_TGLF_SAT3_dataset/SAT3_dataset.tar.gz'
 OUT = ROOT / 'results'
 OUT.mkdir(exist_ok=True)
 SEED = 42
@@ -51,27 +56,39 @@ Archives are read directly, without extracting their contents. Missing or malfor
 ''')
 code('''
 def read_archive(path):
-    rows=[]
-    with tarfile.open(path, 'r:*') as archive:
-        members = {m.name: m for m in archive.getmembers() if m.isfile()}
-        inputs = sorted(n for n in members if n.endswith('/tglf_sat2/input.tglf.gen'))
-        for name in inputs:
-            params={}
-            for line in archive.extractfile(members[name]).read().decode().splitlines():
-                parts=line.split()
-                if len(parts) >= 2:
-                    value,key=parts[:2]
-                    try: value=float(value.replace('D','E').replace('d','e'))
-                    except ValueError: pass
-                    params[key]=value
-            assert params['NS']==2 and params['ZS_1']==-1 and params['ZS_2']==1
-            assert params['SAT_RULE']==2 and params['UNITS']=='GYRO'
-            flux_name=name.rsplit('/',1)[0]+'/out.tglf.gbflux'
-            raw=archive.extractfile(members[flux_name]).read().decode()
-            flux=np.fromstring(raw.replace('D','E').replace('d','e'),sep=' ')
-            assert flux.size==8, (name, flux.size)
-            rows.append({'case':name.split('/')[-3],**params,
-                         'Q_i':flux[3], 'Q_e':flux[2], 'Gamma_e':flux[0]})
+    # Consume the compressed stream once, then parse the cases in the original sorted order.
+    cases = {}
+    with tarfile.open(path, 'r|gz') as archive:
+        for member in archive:
+            folder, _, filename = member.name.rpartition('/')
+            if not member.isfile() or not folder.endswith('/tglf_sat2'):
+                continue
+            if filename not in ('input.tglf.gen', 'out.tglf.gbflux'):
+                continue
+            case = folder.rsplit('/', 2)[-2]
+            files = cases.setdefault(case, {})
+            if filename in files:
+                raise ValueError(f'Duplicate {filename} for case {case}')
+            files[filename] = archive.extractfile(member).read().decode()
+
+    rows = []
+    for case, files in sorted(cases.items()):
+        params = {}
+        for line in files['input.tglf.gen'].splitlines():
+            parts = line.split()
+            if len(parts) >= 2:
+                value, key = parts[:2]
+                try:
+                    value = float(value.replace('D','E').replace('d','e'))
+                except ValueError:
+                    pass
+                params[key] = value
+        assert params['NS']==2 and params['ZS_1']==-1 and params['ZS_2']==1
+        assert params['SAT_RULE']==2 and params['UNITS']=='GYRO'
+        raw = files['out.tglf.gbflux']
+        flux = np.fromstring(raw.replace('D','E').replace('d','e'), sep=' ')
+        assert flux.size==8, (case, flux.size)
+        rows.append({'case':case, **params, 'Q_i':flux[3], 'Q_e':flux[2], 'Gamma_e':flux[0]})
     return pd.DataFrame(rows).set_index('case')
 
 scan_raw=read_archive(SCAN_ARCHIVE)
@@ -385,7 +402,11 @@ for k,f in enumerate(selected_members):
                 'x_scale':f['xs'].scale_.tolist(),'y_mean':f['ys'].scaler.mean_.tolist(),
                 'y_scale':f['ys'].scaler.scale_.tolist(),'gamma_scale':f['ys'].gamma_scale},OUT/f'model_member_{k}.pt')
 versions={p:importlib.metadata.version(p) for p in ['numpy','pandas','torch','scikit-learn','matplotlib','IPython']}
-hashes={p.name:hashlib.file_digest(open(p,'rb'),'sha256').hexdigest() for p in [SCAN_ARCHIVE,SAT3_ARCHIVE]}
+# Record the TAR-stream hash so it can be compared with the original uncompressed archives.
+hashes = {}
+for path in (SCAN_ARCHIVE, SAT3_ARCHIVE):
+    with gzip.open(path, 'rb') as stream:
+        hashes[path.stem] = hashlib.file_digest(stream, 'sha256').hexdigest()
 summary={'selected_name':selected_name,'selected_config':best_single['config'],'ensemble':use_ensemble,
          'split_seed':SEED,'split_sizes':{'train':len(train),'validation':len(val),'test':len(test),'SAT3':len(sat)},
          'excluded':excluded.reset_index().to_dict('records'),'validation':validation.astype(object).where(pd.notna(validation),None).to_dict('records'),
@@ -408,7 +429,7 @@ md('''
 - `Task2_TGLF_surrogate.docx`: required split, metrics, baseline, learning sizes and outside test.
 - `Task 2_ Predicting TGLF Results w_ Modeling.pptx`: groupmate model comparison and motivation to focus on neural networks.
 - `TGLF_surrogate.pptx`: groupmate neural-network ensemble, log heat targets and signed particle target.
-- `scan_db.tar` and `SAT3_dataset.tar`: supplied input files and TGLF SAT2 flux outputs. Dataset hashes and case splits are saved above.
+- `data/Task2_TGLF_scan/scan_db.tar.gz` and `data/Task1_TGLF_SAT3_dataset/SAT3_dataset.tar.gz` contain the supplied TGLF inputs and fluxes. The saved checksums cover their decompressed TAR streams.
 ''')
 nb={'cells':cells,'metadata':{'kernelspec':{'display_name':'Python 3','language':'python','name':'python3'},'language_info':{'name':'python','version':'3.12'}},'nbformat':4,'nbformat_minor':5}
 for i,c in enumerate(cells):c['id']=f'cell-{i:03}'

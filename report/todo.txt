@@ -1,3 +1,0 @@
-[ ] Add your .ipynb files under notebooks/<your_name>/.
-[ ] Incorporate your workflows and findings into the report.
-[ ] Keep additions concise and clear, and follow instructions.md.

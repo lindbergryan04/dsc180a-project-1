@@ -1,9 +1,8 @@
 # Report draft
 
 `report.tex` is the working checkpoint paper and `report.pdf` is its compiled
-preview. Both use the supplied course template. The style and bibliography
-style files are copied unchanged into `style/`; the original template remains
-in `DSC_Capstone_LaTeX_Template/`.
+preview. Both use the supplied course template. The report loads its formatting
+files from `style/`. The template source is in `DSC_Capstone_LaTeX_Template/`.
 
 The draft includes an abstract, introduction and literature review, relevant
 data, methods, preliminary results, and a discussion with remaining work.
@@ -24,8 +23,6 @@ Ryan's notebooks; they do not establish a final ranking of all group methods.
 | `report.pdf` | Compiled checkpoint preview. |
 | `reference.bib` | Five supplied research papers. |
 | `figures/learning_curves.png` | Existing notebook figure, extracted unchanged. |
-| `draft_notes.md` | Evidence locations, interpretation limits, and outstanding group work. |
-| `todo.txt` | Shared space for coordinating pending report additions. |
 | `style/` | Unchanged course formatting files. |
 
 ## Build
@@ -45,10 +42,8 @@ by the course style. For Overleaf, upload `report.tex`, `reference.bib`,
 
 ## Evidence and review
 
-See [draft_notes.md](draft_notes.md) for the source of each numerical table,
-figure, and main finding. Notebook cells and project analysis code were not
-executed or edited while drafting. The report uses their saved outputs and
-records their existing qualifications about model selection and test reuse.
+The report uses saved notebook outputs and
+records qualifications about model selection and test reuse.
 
 Before submission, consolidate the other members' experiments, confirm author
 names and the mentor-approved scope, and review all claims as a group. Code
