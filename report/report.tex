@@ -42,9 +42,10 @@
 \end{center}
 
 \begin{abstract}
-  Repeated evaluations of modern plasma transport models such as CGYRO and TGLF can be costly. This project
+  Repeated runs of the gyrokinetic code CGYRO and the trapped gyro-Landau
+  fluid (TGLF) transport model can be costly. This project
   investigates methods for approximating the ion heat, electron heat, and electron
-  particle fluxes predicted by the trapped gyro-Landau fluid (TGLF) model.
+  particle fluxes predicted by TGLF.
   We explore a variety of TGLF simulation runs, compare candidate models, and test
   choices in input representation, network design, and training to produce a machine learning model comparable to TGLF.
   An initial study of 43 scan cases shows that greater model flexibility does not consistently
@@ -55,7 +56,7 @@
   activation comparison also reveals different tradeoffs for heat and particle flux prediction.
   However, uncertainty analysis shows that the accuracy of the neural network ensemble depends
   heavily on the TGLF data it is trained on. Test data with variables outside the range of the
-  training data, or even DIII-D data that is not distributed like the training data, is subject
+  training data, or even data from the DIII-D tokamak that is not distributed like the training data, is subject
   to significant accuracy drops, usually through a systematic bias in flux predictions. Overall,
   this motivates further development and tuning through a larger variety of training data and
   continued robust uncertainty analysis.
@@ -71,7 +72,8 @@
 Turbulence transports heat and particles across a tokamak plasma and affects
 its temperature and density profiles. Predicting these fluxes is part of
 modeling plasma confinement. Detailed turbulence simulations are expensive,
-and even reduced models such as TGLF can become costly when a larger
+and even reduced models such as the trapped gyro-Landau fluid (TGLF) model
+can become costly when a larger
 calculation requires many evaluations \citep{meneghini2017, cao2026}.
 A surrogate learns to approximate a simulation from previously computed
 input-output pairs, making repeated predictions less expensive.
@@ -82,7 +84,11 @@ constraints. We began by examining the plasma inputs, output scales, and data
 quality, then explored regression, tree-based, and neural network methods.
 We assess choices through prediction error, computational cost, and behavior
 across plasma conditions. Uncertainty estimates provide an additional way to
-examine model reliability. DIII-D is an application within this investigation.
+examine model reliability. One case study uses plasma conditions from
+\href{https://www.ga.com/magnetic-fusion/diii-d}{DIII-D}, a tokamak operated
+by General Atomics in San Diego. A tokamak uses magnetic fields to confine
+hot plasma in a doughnut-shaped chamber. We use inputs based on a DIII-D
+experiment to compare surrogate predictions with TGLF outputs.
 
 The prediction targets are ion heat flux $Q_i$, electron heat flux $Q_e$, and
 electron particle flux $\Gamma_e$. The reference values are TGLF outputs.
@@ -95,8 +101,8 @@ which methods performed well.
 
 \subsection{Related Work on Neural Network Transport Surrogates}
 
-\citet{meneghini2017} developed neural network surrogates of TGLF and EPED1
-and incorporated them into a coupled core and pedestal modeling workflow.
+\citet{meneghini2017} developed neural network surrogates for TGLF and for
+EPED1, a model of the plasma edge pedestal, and incorporated them into a coupled core and pedestal modeling workflow.
 Their TGLF architecture description in Section~3.1 specifies an ensemble of
 32 independently initialized networks, each with one hidden layer of 60
 neurons. This provides a precedent for averaging networks and a reference
@@ -106,11 +112,12 @@ differ from theirs, so our experiments evaluate the approach in a different
 setting.
 
 Model evaluation also requires attention to local behavior.
-\citet{vandeplassche2020} developed QLKNN, a neural network surrogate of the
-QuaLiKiz transport model. Their work emphasizes evaluating local transport
+\citet{vandeplassche2020} developed the QuaLiKiz neural network (QLKNN)
+to approximate QuaLiKiz, a quasilinear gyrokinetic transport model. Their work emphasizes evaluating local transport
 behavior alongside aggregate prediction error, motivating our checks of flux
 trends and individual prediction failures.
-\citet{cao2026} developed TGLF-WINN using feature engineering, transformed
+\citet{cao2026} developed a wavenumber-informed neural network for TGLF
+(TGLF-WINN) using feature engineering, transformed
 flux targets, and supervision of flux contributions at individual
 wavenumbers. Their comparisons of individual design components illustrate
 how controlled experiments can identify useful modeling choices. We use
@@ -123,9 +130,11 @@ using neural network ensembles to guide training-data selection for QuaLiKiz
 surrogates. This provides context for studying data requirements and
 uncertainty, although our current experiments use fixed training datasets
 rather than active acquisition. Finally, \citet{dudding2022} developed the
-SAT3 saturation rule using nonlinear CGYRO simulations, with particular
+third version of the TGLF saturation rule (SAT3) using nonlinear
+simulations with the gyrokinetic code CGYRO, with particular
 attention to isotope dependence. The course's starter dataset draws on that
-work, but the added TGLF outputs supplied for our analysis use SAT2. The
+work, but the added TGLF outputs supplied for our analysis use the second
+version of the saturation rule (SAT2). The
 saturation rule and reference simulation must therefore remain explicit.
 
 \subsection{Datasets: Starter Scans, \texttt{scan\_db}, and Evaluation Sets}
@@ -159,9 +168,9 @@ the remaining work.
 
 On the 43 starter scans, greater model flexibility did not consistently
 improve prediction, and low aggregate error coexisted with wrong flux signs.
-On the larger \texttt{scan\_db} database, an MLP had the lowest error and the
+On the larger \texttt{scan\_db} database, a multilayer perceptron (MLP) had the lowest error and the
 fastest prediction of the models we compared, and the accuracy ensemble
-reduced test root mean squared error by 59.6\%--77.2\% relative to a linear
+reduced test root mean squared error (RMSE) by 59.6\%--77.2\% relative to a linear
 baseline. The quantile ensemble's 90\% intervals covered 94--98\% of test
 cases and were widest where training data was sparse. Error rose on inputs
 outside the training range, and at the DIII-D reference case the surrogate
@@ -190,7 +199,7 @@ separate training runs, so their results should not be mixed.
     Name                    & What it is                                                                                                          & Described                        & Reported                                                   \\
     \midrule
     Starter-scan models     & Mean baseline, linear, spline, quadratic, and random forest fits on the 43 starter cases                            & \S\ref{sec:starter-methods}      & \S\ref{sec:starter-results}                                \\
-    Model-family comparison & Random forest, XGBoost, and a single MLP, each on raw and log targets, trained on \texttt{scan\_db}                 & \S\ref{sec:modelfamily-setup}    & \S\ref{sec:modelfamily-results}                            \\
+    Model-family comparison & Random forest, extreme gradient boosting (XGBoost), and a single MLP, each on raw and log targets, trained on \texttt{scan\_db}                 & \S\ref{sec:modelfamily-setup}    & \S\ref{sec:modelfamily-results}                            \\
     Accuracy ensemble       & Five MLPs with different seeds, averaged, predicting one value per flux; includes the activation search             & \S\ref{sec:ensemble-methods}     & \S\ref{sec:ensemble-results}, \S\ref{sec:learning-results} \\
     Quantile ensemble       & Five MLPs that each predict the 5th, 50th, and 95th percentile of every flux (pinball loss), giving a 90\% interval & \S\ref{sec:interval-methods}     & \S\ref{sec:coverage-results} to \S\ref{sec:d3d-results}    \\
     15-network ensemble     & Fifteen MLPs whose intervals come from disagreement between members                                                 & \S\ref{sec:disagreement-methods} & \S\ref{sec:disagreement-results}                           \\
@@ -354,7 +363,7 @@ and accuracy of random forest, XGBoost, and single MLP models. To represent the
 accuracy of each model fairly, all three architectures were trained on both raw
 and log-transformed flux outputs, and all were tuned with the same
 cross-validation function through grid search. A fixed ridge regression serves
-as the baseline. We report normalized RMSE (nRMSE), which is the RMSE of each
+as the baseline. We report normalized root mean squared error (nRMSE), which is the RMSE of each
 flux in units of that flux's training-set standard deviation, averaged over
 the three fluxes. All reported nRMSE and $R^2$ values are in raw flux units, so
 raw-target and log-target models can be compared. The timing, learning-curve,
@@ -372,18 +381,21 @@ interaction terms. These baselines differ from the grouped ridge models in
 the starter-data experiment.
 
 Each network has layer widths $11$--$64$--$64$--$8$--$3$ and a linear output
-layer. The five members use seeds 42--46. Training uses AdamW, batch size 256,
+layer. The five members use seeds 42--46. Training uses adaptive moment estimation with decoupled weight decay
+(AdamW), batch size 256,
 and weight decay $10^{-4}$, with 30 warmup epochs at learning rate $0.001$
 and up to 120 further epochs at $0.003$. Validation selects the saved checkpoint,
 with early stopping after 25 epochs without improvement. Each member's heat
 outputs are inverted before taking the equal-weight average of all five
 predictions.
 
-We tested four activation combinations. The first activation was applied to
+We tested four combinations of the Gaussian error linear unit (GELU),
+rectified linear unit (ReLU), and hyperbolic tangent (tanh) activations. The first activation was applied to
 both 64-unit layers, and the second to the 8-unit layer: GELU with tanh,
 ReLU with tanh, GELU with ReLU, and ReLU throughout. Across combinations, we matched initial
 weights and minibatch order within each seed and held the architecture, data,
-scalers, and training settings fixed. The selection score was
+scalers, and training settings fixed. Using each target's training standard
+deviation (SD), we computed the selection score
 \begin{equation}
   S = \frac{1}{3}\sum_{j\in\{Q_i,Q_e,\Gamma_e\}}
   \frac{\operatorname{RMSE}_{\mathrm{val},j}}
@@ -407,7 +419,7 @@ and~\ref{tab:activations}).
 \subsection{Evaluation Protocol, Learning Curves, and Test-Set Caveats}
 \label{sec:eval-methods}
 
-We report root mean squared error (RMSE) and $R^2$ in addition to the selection
+We report RMSE and $R^2$ in addition to the selection
 score. Learning curves use nested training subsets of 250, 500, 1,000, 2,000,
 and 3,496 cases, defined by a fixed permutation with seed 2026. Scalers were
 refitted on each subset, with the same validation set for checkpoint selection.
@@ -473,8 +485,10 @@ Sections~\ref{sec:coverage-results} to~\ref{sec:d3d-results}.
 \subsection{Prediction Intervals II: Member Disagreement}
 \label{sec:disagreement-methods}
 
-The second method is the 15-network ensemble, a separate experiment that
-assessed uncertainty using member disagreement.
+For this uncertainty experiment, we expanded the ensemble from 5 to 15 neural
+networks to bring it closer in size to the 32-network ensemble that
+\citet[Section~3.1]{meneghini2017} used for their TGLF surrogate. We estimated
+uncertainty from disagreement among the 15 members.
 For each flux, prediction intervals were centered on the ensemble mean. Their
 half-width was a calibrated multiplier times the larger of the member sample
 standard deviation and 1\% of the training-target standard deviation.
@@ -711,7 +725,8 @@ of data needed to reach a specified accuracy.
   \label{fig:learning}
 \end{figure}
 
-In the recorded DSMLP CPU evaluation, training all five networks took 24.01\,s.
+Training all five networks on a central processing unit (CPU) on UC San Diego's
+Data Science/Machine Learning Platform (DSMLP) took 24.01\,s.
 Median prediction latency was 0.814\,ms for one case, while a batch of 750
 averaged 4.51\,$\mu$s per case. Training used four threads and prediction used
 one. Prediction timings used seven repetitions after warmup and included
