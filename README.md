@@ -140,11 +140,24 @@ python "$joey/Task 2/support/check_results.py" --notebook "$out/task2.ipynb"
 jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=python3 --output=task3 --output-dir="$out" "$joey/Task 3/Task3_TGLF_Ensemble.ipynb"
 ```
 
+Task 4 needs TGLF on `PATH` (GACODE commit `1df9cdce`). Extract `task4_d3d.tar.gz`, copy `make_db.py` into its `tools/` folder, and run from inside `task4_d3d`:
+
+```sh
+t4="<repo>/notebooks/jscalderon/Task 4"
+python tools/run_tglf_parallel.py d3d_profile -nproc 16
+python "$t4/collect_d3d.py" step1 . "$t4/step1_check.csv"
+python tools/make_db.py                                  # seed 3, 1,000 cases
+python tools/run_tglf_parallel.py d3d_mydb_3/data -nproc 16
+python "$t4/collect_d3d.py" table . 3 "$t4/d3d_database.csv"
+python "$t4/plot_d3d.py"
+```
+
 | Task | What to check |
 | --- | --- |
 | 1 | Parses 43 SAT3 cases and checks eight isotope triplets. The parsed JSON is in `data/generated/joey/task1/`. The third flux block is momentum (`Pi`), and the fourth is energy exchange (`S`). |
 | 2 | Regenerates tables, predictions, figures, and weights in `Task 2/results/`. The expected split is 3,496 training, 750 validation, and 750 test cases, with 43 separate SAT3 cases. Recorded test RMSE is 17.125 for ion heat, 12.700 for electron heat, and 3.453 for electron particle flux. The read-only checker recalculates the metrics from predictions and exits with an error on discrepancies. |
 | 3 | Trains its own ensemble and displays results in `data/generated/joey/task3.ipynb`. Expected inputs are 5,000 scan cases, 270 outside-range cases, and 300 perturbed DIII-D cases. Recorded test coverage was 89.7% for electron heat, 89.2% for ion heat, and 93.1% for electron particle flux. |
+| 4 | All 13 profile radii match `d3d_profile_answers.dat`. `d3d_database.csv` has 1,000 cases (seed 3) in the same columns as Aryan's; all runs succeeded, 994 have positive heat fluxes, and none duplicate a teammate's case. |
 
 The Task 2 run replaces the saved files in its results directory. To check the existing results alone, run `python "$joey/Task 2/support/check_results.py"`.
 
