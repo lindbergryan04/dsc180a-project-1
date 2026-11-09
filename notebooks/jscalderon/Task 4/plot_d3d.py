@@ -35,14 +35,22 @@ fig.savefig(OUT / "d3d_profile_fluxes.png", dpi=150)
 # Step 2: where the DIII-D database sits inside the scan_db box
 me = pd.read_csv(HERE / "d3d_database.csv").rename(columns={"r_over_a": "RMIN_LOC"})
 scan = pd.read_csv(SCAN)
-feats = ["RLTS_1", "RLTS_2", "RLNS_1", "TAUS_2", "XNUE", "RMIN_LOC"]
-fig, axes = plt.subplots(2, 3, figsize=(12, 6.5))
-for ax, f in zip(axes.flat, feats):
+feats = {  # names from the Task 1 and Task 4 handouts
+    "RLTS_1": "Electron temperature gradient ($a/L_{T_e}$)",
+    "RLTS_2": "Ion temperature gradient ($a/L_{T_i}$)",
+    "RLNS_1": "Density gradient ($a/L_n$)",
+    "TAUS_2": "Ion-to-electron temperature ratio ($T_i/T_e$)",
+    "XNUE": "Electron collision frequency",
+    "RMIN_LOC": "Minor radius ($r/a$)",
+}
+fig, axes = plt.subplots(2, 3, figsize=(13, 6.5))
+for ax, (f, name) in zip(axes.flat, feats.items()):
     lo, hi = min(me[f].min(), scan[f].min()), max(me[f].max(), scan[f].max())
     bins = np.geomspace(lo, hi, 40) if f == "XNUE" else np.linspace(lo, hi, 40)
     ax.hist(scan[f], bins=bins, density=True, color=BLUE, alpha=0.55, label=f"scan_db (n={len(scan)})")
     ax.hist(me[f], bins=bins, density=True, color=ORANGE, alpha=0.55, label=f"DIII-D, seed 3 (n={len(me)})")
-    ax.set(title=f, yticks=[])
+    ax.set(yticks=[])
+    ax.set_title(name, fontsize=11)
     if f == "XNUE":
         ax.set_xscale("log")
 axes.flat[0].legend(frameon=False, fontsize=9)
