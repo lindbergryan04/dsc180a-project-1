@@ -45,6 +45,7 @@ desktop.ini
 notebooks/**/SAT3_dataset/
 notebooks/**/scan_db_outside/
 notebooks/**/data_d3d/
+notebooks/**/original_data/
 
 # Downloaded archives
 *.tar.gz
