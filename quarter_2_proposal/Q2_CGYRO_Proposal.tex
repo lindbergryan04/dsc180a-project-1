@@ -95,6 +95,17 @@ approximation error; at $\alpha_c=1$, it applies the full correction.
 This two-NN option permits prediction without either physics code.
 Its architecture and correction rule remain experimental choices.
 
+\textbf{Spectral alternative.} TGLF builds each flux by adding up
+contributions from turbulence at different length scales. Prior work found
+that much of TGLF's disagreement with nonlinear simulations comes from one
+part of that calculation, its estimate of how strong the turbulence becomes
+at larger scales, rather than from the rest of the model \cite{dudding2022}.
+If the archive includes these per-scale breakdowns, we can test a correction
+that adjusts only that component and then re-adds the contributions,
+instead of correcting each total flux separately. This gives the correction
+a more constrained structure with fewer free parameters. We treat it as a
+stretch comparison contingent on the audit.
+
 \section{Open design choices}
 
 {\small
@@ -113,6 +124,13 @@ Training targets &
 Do auxiliary flux-spectrum targets improve learning from the same runs?
 Align spectral bins and totals; choose normalization and loss weights that
 preserve signed fluxes and handle uncertain, near-zero targets. \\[4pt]
+Correction scale &
+Compare corrections learned as additive residuals, as residuals in an
+$\operatorname{arcsinh}$-transformed flux space, and (for heat fluxes) as
+log ratios $\log(F^{\mathrm{CGYRO}}_c/F^{\mathrm{TGLF}}_c)$. Fluxes span
+orders of magnitude, so additive residuals are dominated by high-flux cases;
+multiplicative corrections preserve stable (zero-flux) predictions and
+signed particle fluxes require the transformed form. \\[4pt]
 Correction rule &
 Compare full, fixed, and case-dependent correction fractions. Test distance
 to nonlinear training data and correction-ensemble disagreement as signals
@@ -165,6 +183,21 @@ development data. Low correction coverage limits applicability; reverting everyw
 cannot improve accuracy over the base surrogate. Assess learning curves, resolvable
 particle-flux signs, and total inference time.
 
+\textbf{Checks beyond average error.} Low average error can still hide
+failures that matter when the surrogate is used, so we add two checks.
+\emph{Isotope trends:} some cases repeat the same plasma conditions with
+different hydrogen isotopes (hydrogen, deuterium, and tritium). We test
+whether each model reproduces how the nonlinear fluxes change across
+isotopes, a trend that existing fast models are known to get wrong
+\cite{dudding2022}; these scans are held out together. \emph{Smoothness:}
+where cases vary one input step by step, we check that predictions change
+smoothly, without artificial bumps or jumps, and respond to that input about
+as strongly as the nonlinear references do. Surrogates that change abruptly
+can prevent the larger simulations that use them from converging
+\cite{meneghini2017,cao2026}, so the correction weight must also change
+gradually, and a correction should not lower average error at the cost of
+rougher predictions.
+
 \section{Challenges, quarter plan, and outcome}
 
 The main challenges are matching simulation physics and normalization,
@@ -182,7 +215,9 @@ coverage, and reverting to the base surrogate does not guarantee accuracy.
 \midrule
 Weeks 1--2 & Audit coverage and compatibility; define scope, splits, and tolerances. \\[4pt]
 Weeks 3--5 & Establish TGLF-surrogate accuracy; train matched correction baselines. \\[4pt]
-Weeks 6--8 & Test transferable features, richer targets, and correction weighting. \\[4pt]
+Weeks 6--8 & Test correction scales, transferable features, richer targets (including
+per-scale correction if data permit), and correction weighting; add
+isotope-trend and smoothness checks. \\[4pt]
 Weeks 9--10 & Evaluate frozen models; deliver reproducible code and a paper draft. \\
 \bottomrule
 \end{tabular}\par
@@ -212,6 +247,16 @@ turbulent transport modeling in fusion. \textit{Nuclear Fusion}.
 \bibitem{dudding2024}
 Dudding, H. (2024). \textit{SAT3 Dataset}, version 1. Zenodo.
 \url{https://zenodo.org/records/14505760}.
+\bibitem{dudding2022}
+Dudding, H. G. et al. (2022). A new quasilinear saturation rule for tokamak
+turbulence with application to the isotope scaling of transport.
+Nuclear Fusion 62, 096005.
+\href{https://doi.org/10.1088/1741-4326/ac7a4d}{doi:10.1088/1741-4326/ac7a4d}.
+\bibitem{meneghini2017}
+Meneghini, O. et al. (2017). Self-consistent core-pedestal transport
+simulations with neural network accelerated models.
+Nuclear Fusion 57, 086034.
+\href{https://doi.org/10.1088/1741-4326/aa7776}{doi:10.1088/1741-4326/aa7776}.
 \end{thebibliography}
 }
 \end{document}
