@@ -1,0 +1,218 @@
+% Standalone source: compile twice with pdfLaTeX; no external files required.
+\documentclass[10pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[hmargin=0.8in,vmargin=0.7in]{geometry}
+\usepackage{amsmath,booktabs,array,longtable}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+ pdftitle={Neural transport surrogates trained with TGLF and nonlinear CGYRO data},
+ pdfsubject={UC San Diego DSC 180 Quarter 2 research proposal}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{1em}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0pt}
+ {9pt plus 1pt minus 1pt}{4pt}{\normalfont\large\bfseries}}
+\makeatother
+\pagestyle{plain}
+\begin{document}
+\begin{center}
+ {\fontsize{17}{20}\selectfont\bfseries
+ Neural transport surrogates trained with\\
+ TGLF and nonlinear CGYRO data\par}
+ \vspace{6pt}
+ UC San Diego \enspace $\cdot$ \enspace DSC 180 \enspace $\cdot$ \enspace
+ Quarter 2 Research Proposal
+\end{center}
+
+\section{Objective}
+
+\textbf{Develop a fast neural network (NN) surrogate for heat and particle
+transport using broad TGLF training data and sparse nonlinear CGYRO
+references, and test whether CGYRO-based corrections improve predictions
+across plasma regimes.}
+
+\section{Novelty and relationship to prior work}
+
+Existing research demonstrates several foundations of this project.
+GKNN-0 incorporates linear CGYRO information to address differences between
+TGLF and gyrokinetic predictions \cite{neiser2024}. SAT3-NN learns saturated
+turbulence spectra from nonlinear CGYRO simulations to construct a neural
+saturation model \cite{sar2026}. TGLF-WINN uses wavenumber-resolved
+supervision to improve TGLF surrogate training \cite{cao2026}. These studies
+motivate combining TGLF predictions, nonlinear simulation data, and
+spectral information.
+
+\textbf{Our proposed contribution is to determine whether approximately
+300 nonlinear CGYRO cases, dispersed across plasma regimes, can support a
+transferable neural correction to a broadly trained TGLF surrogate.}
+We will evaluate whether the corrected model improves agreement with
+held-out nonlinear CGYRO results, which conditions benefit or deteriorate,
+and whether estimates of correction reliability can usefully determine
+when---and how strongly---to apply the correction. Where suitable
+diagnostics are available, we will also test whether spectral supervision
+improves predictions beyond training on integrated fluxes alone.
+Evaluation will report both prediction error and the fraction of cases
+receiving corrections, so that improvement can be distinguished from
+simply reverting to the TGLF baseline.
+
+The intended research contribution is evidence about \textbf{the
+transferability and limits of nonlinear corrections under sparse
+coverage}, together with a fast hybrid surrogate if the approach succeeds.
+
+\section{Data and a candidate hybrid surrogate}
+
+We can start with the 43 nonlinear SAT3 cases \cite{dudding2024} and matched
+TGLF-SAT2 calculations. Emily Belli has confirmed access to a larger
+nonlinear database, described as approximately 300 dispersed cases.
+The audit will establish coverage, compatibility, available diagnostics,
+and overlap with the SAT3 cases. Additional TGLF data can broaden baseline training within a
+defined, physically meaningful input domain. It cannot supply missing
+nonlinear discrepancy labels.
+
+One option is to combine two NNs:
+\begin{itemize}
+ \setlength{\itemsep}{1pt}
+ \setlength{\parskip}{0pt}
+ \item \textbf{Base surrogate $S_\phi$:} learn numerical TGLF fluxes across
+       many plasma conditions.
+ \item \textbf{Correction model $R_\theta$:} learn nonlinear CGYRO minus
+       numerical TGLF flux from matched cases.
+\end{itemize}
+For plasma inputs $x$ and channel $c\in\{Q_i,Q_e,\Gamma_e\}$ (ion heat,
+electron heat, and electron particle flux), the hybrid prediction is
+\begin{equation}
+ \widehat F_c(x)=S_{\phi,c}(x)+\alpha_c(x)\,
+ R_{\theta,c}\!\left(x,S_\phi(x)\right),
+ \qquad 0\leq\alpha_c(x)\leq1.
+ \label{eq:hybrid}
+\end{equation}
+At $\alpha_c=0$, the model returns the TGLF surrogate, including its
+approximation error; at $\alpha_c=1$, it applies the full correction.
+This two-NN option permits prediction without either physics code.
+Its architecture and correction rule remain experimental choices.
+
+\section{Open design choices}
+
+{\small
+\renewcommand{\arraystretch}{1.12}
+\setlength{\LTpre}{0pt}
+\setlength{\LTpost}{0pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash\bfseries}p{1.12in}p{5.56in}@{}}
+\toprule
+Choice & \textbf{Question to resolve using development data} \\
+\midrule
+NN inputs and structure &
+Do surrogate outputs or predicted TGLF diagnostics help beyond plasma
+inputs? Test shared versus channel-specific models and select capacity,
+regularization, and ensemble size. \\[4pt]
+Training targets &
+Do auxiliary flux-spectrum targets improve learning from the same runs?
+Align spectral bins and totals; choose normalization and loss weights that
+preserve signed fluxes and handle uncertain, near-zero targets. \\[4pt]
+Correction rule &
+Compare full, fixed, and case-dependent correction fractions. Test distance
+to nonlinear training data and correction-ensemble disagreement as signals
+of benefit. Confidence in the base surrogate is a separate quantity. \\[4pt]
+Model coupling &
+Compare the two-NN option with TGLF pretraining followed by CGYRO
+fine-tuning, if feasible. Any live solver inputs must be included in
+prediction cost. \\
+\bottomrule
+\end{longtable}
+}
+
+\section{Evaluation under sparse nonlinear coverage}
+
+\textbf{Two distinct accuracy tests.}
+First evaluate the base NN against independent numerical TGLF cases.
+Then evaluate nonlinear improvement against independent CGYRO references.
+A useful correction can increase disagreement with TGLF labels; TGLF-only
+test cases cannot establish improved CGYRO accuracy.
+
+\textbf{Coverage and independent splits.}
+Audit similarity in physically relevant inputs before defining splits.
+Where supported, distinguish nearby predictions from transfer to separated
+conditions. If the archive supplies only separated cases, evaluate that
+harder transfer task and report its uncertainty. Hold out related
+discharges or scan families together; keep their spectra, time blocks,
+and duplicate references together. Document both TGLF and nonlinear
+training coverage of each test case.
+
+Choose model settings and calibrate corrections within development data;
+withhold final nonlinear test labels. Sparse coverage may prevent useful
+case-dependent calibration. Full and fixed corrections remain comparison
+models even if the selection rule fails.
+
+\textbf{Controlled comparisons and error sources.}
+Compare the uncorrected base surrogate with full, fixed, and weighted
+corrections and simple recalibration, using identical nonlinear training
+subsets for correction methods. Include numerical TGLF as a reference. Compare
+numerical TGLF plus correction with the surrogate plus the same correction
+to separate baseline approximation error. Compare spectral and total-only
+training on identical runs; wavelengths and time samples are not
+independent plasma conditions.
+
+\textbf{Accuracy and usefulness of correction.}
+Report mean absolute error by flux and test family across \emph{all} cases,
+including uncorrected ones. Report correction magnitudes, the fraction
+meaningfully corrected, and the frequency and size of gains and failures.
+Measure accuracy versus correction coverage using rules chosen on
+development data. Low correction coverage limits applicability; reverting everywhere
+cannot improve accuracy over the base surrogate. Assess learning curves, resolvable
+particle-flux signs, and total inference time.
+
+\section{Challenges, quarter plan, and outcome}
+
+The main challenges are matching simulation physics and normalization,
+separating noisy nonlinear averages from systematic discrepancies, and
+learning transferable corrections from sparse conditions. Audit numerical
+convergence and estimate averaging uncertainty where diagnostics permit.
+Broad TGLF coverage does not establish reliable nonlinear correction
+coverage, and reverting to the base surrogate does not guarantee accuracy.
+
+{\small
+\noindent
+\begin{tabular}{@{}p{0.95in}p{5.73in}@{}}
+\toprule
+\textbf{Period} & \textbf{Milestone} \\
+\midrule
+Weeks 1--2 & Audit coverage and compatibility; define scope, splits, and tolerances. \\[4pt]
+Weeks 3--5 & Establish TGLF-surrogate accuracy; train matched correction baselines. \\[4pt]
+Weeks 6--8 & Test transferable features, richer targets, and correction weighting. \\[4pt]
+Weeks 9--10 & Evaluate frozen models; deliver reproducible code and a paper draft. \\
+\bottomrule
+\end{tabular}\par
+}
+
+The study requires no new nonlinear runs. Deliver a fast surrogate,
+independent evaluation, and a paper draft. If correction fails, investigate
+coverage, noise, representation, and model choice. Experimental validation
+and weight-space programming would be subsequent extensions.
+
+{\small
+\begin{thebibliography}{9}
+\setlength{\itemsep}{2pt}
+\setlength{\parskip}{0pt}
+\bibitem{neiser2024}
+Neiser et al. (2024). Large database validation of TGLF on DIII-D and
+MAST-U plasmas. \textit{APS Division of Plasma Physics}, conference abstract
+PP12.00097. \href{https://meetings-archive.aps.org/dpp/2024/pp12/97/}{APS abstract}.
+\bibitem{sar2026}
+Sar et al. (2026). A machine learning framework for developing quasilinear
+saturation rules of turbulent transport from linear gyrokinetic data.
+Preprint. \href{https://arxiv.org/abs/2604.00462}{arXiv:2604.00462}.
+\bibitem{cao2026}
+Cao et al. (2026). TGLF-WINN: data-efficient deep learning surrogate for
+turbulent transport modeling in fusion. \textit{Nuclear Fusion}.
+\href{https://doi.org/10.1088/1741-4326/ae72a6}{doi:10.1088/1741-4326/ae72a6}.
+\bibitem{dudding2024}
+Dudding, H. (2024). \textit{SAT3 Dataset}, version 1. Zenodo.
+\url{https://zenodo.org/records/14505760}.
+\end{thebibliography}
+}
+\end{document}
+
