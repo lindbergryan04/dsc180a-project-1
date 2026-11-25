@@ -1,0 +1,15 @@
+<section id="project" class="dark">
+<p class="eyebrow">DSC 180 · QUARTER 2 PROPOSAL</p>
+<h1>Heat and Particle Transport surrogates: Leveraging TGLF and nonlinear CGYRO data</h1>
+<p class="lede">We aim to produce a fast and reliable neural-network surrogate model for heat and particle transport trained on TGLF across wide parameter ranges, then correct it toward sparse nonlinear CGYRO and test where that correction transfers.</p>
+<div class="spacer"></div>
+<div class="model">
+<div class="mcard"><p class="tag">TRAINED ON BROAD TGLF DATA</p><h3>Base surrogate S<i>φ</i></h3><p class="desc">Predicts the 5th, 50th and 95th percentiles of each flux: a median plus an uncertainty band.</p></div>
+<div class="op"><p>+</p></div>
+<div class="mcard"><p class="tag">TRAINED ON ~300 CGYRO CASES</p><h3>Correction R<i>θ</i>, weighted by <i>α</i></h3><p class="desc">Learns the CGYRO − TGLF gap; <i>α</i> between 0 and 1 sets how much is applied, case by case.</p></div>
+<div class="op"><p>=</p></div>
+<div class="mcard out"><p class="tag">NO PHYSICS CODE AT RUN TIME</p><h3>Hybrid flux prediction</h3><p class="desc">Ion heat, electron heat and electron particle flux (Q<i>i</i>, Q<i>e</i>, Γ<i>e</i>).</p></div>
+</div>
+<p class="eq">F̂<i>c</i>(x) = S<i>φ,c</i>(x) + <i>α</i><i>c</i>(x) · R<i>θ,c</i>(x, S<i>φ</i>(x)),   0 ≤ <i>α</i><i>c</i> ≤ 1</p>
+<aside>Our Q2 project is a two-part hybrid surrogate. First, a neural network trained on lots of cheap TGLF runs that predicts each flux as a 5/50/95 percentile band. Second, a small correction network trained on matched nonlinear CGYRO cases that nudges the TGLF prediction toward CGYRO. Alpha controls how much of that correction we trust in each case. Once trained, it predicts fluxes without running TGLF or CGYRO.</aside>
+</section>

@@ -1,0 +1,66 @@
+section {
+  --navy: #14213D;
+  --navy2: #22325A;
+  --paper: #F7F6F2;
+  --card: #ECE8DF;
+  --ink: #14213D;
+  --body: #3F4A5E;
+  --orange: #B4531F;
+  --orange-lt: #F2A35E;
+  --mist: #C9D3E6;
+  padding: 128px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--body);
+  font-family: 'IBM Plex Sans', Arial, sans-serif;
+  font-size: 28px;
+  line-height: 1.4;
+}
+section.dark { background: var(--navy); color: var(--mist); }
+
+.eyebrow { font-size: 24px; font-weight: 600; letter-spacing: 2px; color: var(--orange); }
+section.dark .eyebrow { color: var(--orange-lt); }
+
+h1, h2 { font-family: 'Source Serif 4', Georgia, serif; font-size: 64px; font-weight: 600; line-height: 1.1; color: var(--ink); margin-top: 16px; }
+section.dark h1 { color: #F3F1EA; }
+h3 { font-family: 'IBM Plex Sans', Arial, sans-serif; font-size: 36px; font-weight: 600; line-height: 1.2; color: var(--ink); }
+
+.lede { font-size: 28px; max-width: 1360px; margin-top: 32px; }
+.spacer { flex: 1; }
+.small { font-size: 24px; }
+
+/* Slide 1: model diagram */
+.model { display: flex; align-items: stretch; gap: 24px; }
+.op { display: flex; align-items: center; }
+.op p { font-family: 'Source Serif 4', Georgia, serif; font-size: 64px; color: var(--orange-lt); }
+.mcard { flex: 1; background: var(--navy2); border-top: 6px solid var(--orange-lt); padding: 32px; display: flex; flex-direction: column; gap: 12px; }
+.mcard h3 { color: #F3F1EA; }
+.mcard .tag { font-size: 24px; font-weight: 600; color: var(--orange-lt); }
+.mcard .desc { font-size: 24px; color: var(--mist); }
+.mcard.out { border-top-color: var(--mist); }
+.eq { font-size: 24px; color: var(--mist); margin-top: 28px; }
+
+/* Slide 2: question cards */
+.qrow { display: flex; gap: 32px; margin-top: 56px; }
+.qcard { flex: 1; background: var(--card); padding: 40px; display: flex; flex-direction: column; gap: 16px; }
+.qcard .num { font-family: 'Source Serif 4', Georgia, serif; font-size: 64px; font-weight: 600; line-height: 1; color: var(--orange); }
+.qcard .desc { font-size: 28px; }
+.evalrow { display: flex; gap: 32px; border-top: 2px solid var(--ink); padding-top: 28px; }
+.evalcol { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.evalcol .tag { font-size: 24px; font-weight: 600; color: var(--orange); }
+.evalcol .desc { font-size: 28px; color: var(--ink); }
+
+/* Slide 3: data + timeline */
+.cols { display: flex; gap: 96px; margin-top: 56px; flex: 1; }
+.datacol { width: 600px; display: flex; flex-direction: column; gap: 20px; }
+.datacol ul { font-size: 28px; color: var(--ink); padding-left: 32px; }
+.datacol li { margin-bottom: 14px; }
+.note { font-size: 24px; background: var(--card); padding: 20px 24px; color: var(--ink); }
+.timeline { flex: 1; display: flex; flex-direction: column; }
+.trow { display: flex; gap: 32px; border-top: 2px solid var(--mist); padding: 22px 0; }
+.trow .when { width: 170px; font-size: 24px; font-weight: 600; color: var(--orange); padding-top: 3px; }
+.trow .what { flex: 1; font-size: 28px; color: var(--ink); }
+.deliver { background: var(--navy); color: #F3F1EA; padding: 24px 32px; font-size: 28px; }
+.deliver b { color: var(--orange-lt); }
