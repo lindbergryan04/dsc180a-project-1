@@ -1,0 +1,10 @@
+split,target,candidate,reference,mean_rmse_difference,ci_95_low,ci_95_high,bootstrap_draws,bootstrap_seed,n_cases,strata,estimand
+test,Q_e,separate,shared,-0.5239141350635066,-2.616886882291575,1.464230903788661,2000,180513,1100,13,mean paired RMSE difference across three fixed repeats
+test,Q_e,output_specific_shared,shared,0.0,0.0,0.0,2000,180513,1100,13,mean paired RMSE difference across three fixed repeats
+test,Q_e,separate,capacity_control,-1.2265503587252464,-2.5088321173580126,0.5230540263500202,2000,180513,1100,13,mean paired RMSE difference across three fixed repeats
+test,Q_i,separate,shared,-0.3953068822922783,-1.0666663293667826,0.21980384039587292,2000,180514,1100,13,mean paired RMSE difference across three fixed repeats
+test,Q_i,output_specific_shared,shared,-0.2702847437835152,-0.7877015557977727,0.19326770691729556,2000,180514,1100,13,mean paired RMSE difference across three fixed repeats
+test,Q_i,separate,capacity_control,-0.12456553751577326,-0.6420868763884087,0.43711953451475416,2000,180514,1100,13,mean paired RMSE difference across three fixed repeats
+test,Gamma_e,separate,shared,-0.02467888177958825,-0.05039954370845201,0.0048198626186872085,2000,180515,1100,13,mean paired RMSE difference across three fixed repeats
+test,Gamma_e,output_specific_shared,shared,0.0,0.0,0.0,2000,180515,1100,13,mean paired RMSE difference across three fixed repeats
+test,Gamma_e,separate,capacity_control,-0.02708008596588493,-0.05058936535493432,-0.003993583060543657,2000,180515,1100,13,mean paired RMSE difference across three fixed repeats

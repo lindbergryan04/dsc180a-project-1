@@ -1,0 +1,10 @@
+target,comparison,n,rmse,median_relative_difference,share_within_5pct
+Q_e,surrogate (full-data A6 model),385,11.5078,0.0242334,0.74026
+Q_e,"TGLF, NBASIS 16/16",385,23.0865,0.0615119,0.420779
+Q_e,"TGLF, NBASIS 2/4",385,24.8907,0.239476,0.127273
+Q_i,surrogate (full-data A6 model),385,1.12998,0.0224653,0.706494
+Q_i,"TGLF, NBASIS 16/16",385,1.92557,0.0519132,0.485714
+Q_i,"TGLF, NBASIS 2/4",385,8.16975,0.309524,0.137662
+Gamma_e,surrogate (full-data A6 model),385,0.307121,0.0473025,0.514286
+Gamma_e,"TGLF, NBASIS 16/16",385,0.499147,0.119583,0.244156
+Gamma_e,"TGLF, NBASIS 2/4",385,0.862449,0.557764,0.0363636

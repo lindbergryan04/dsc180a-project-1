@@ -38,7 +38,7 @@ Aryan Nath
 | `data/Task4_DIIID_Database/` | Task 4 DIII-D database materials. |
 | `emily_slides/` | Mentor slides and the group's Week 5 check-in presentation. |
 | `references/` | Research papers used for background and related work. |
-| `tasks/` | Mentor-provided instructions for Tasks 1–4. |
+| `tasks/` | Mentor-provided instructions for Tasks 1–7. |
 | `report/` | Checkpoint report source and PDF, references, figures, review notes, and course template source. |
 | `requirements.txt` | Pinned Python dependencies for the project. |
 | `.gitignore` | Excludes datasets, local environments, credentials, and generated build files. |
@@ -83,6 +83,26 @@ python notebooks/ryan/task3/task3_workflow.py --task2 "$runs/task2" --data "$uq"
 ```
 
 Task 1 compares the starter models on 43 cases. Task 2 builds the data splits, trains the baselines and five-network ensemble, and evaluates the activation settings and learning curves. Task 3 uses the Task 2 models and trains ten additional members for the uncertainty analysis. For another training run, set `runs` to a fresh directory. Training times and numerical results can vary with the CPU and software environment.
+
+Tasks 4–7 (the DIII-D database and the Tasks 5–7 handout) each have a folder with a short
+README, the scripts, the result tables the report cites, and a read-only results notebook.
+Run them in order; each README lists its inputs and checks.
+
+| Folder | Task | Main command(s) |
+| --- | --- | --- |
+| `notebooks/ryan/task4/` | DIII-D #128913 database and team merge | `tglf_cases.py`, `team_database.py` |
+| `notebooks/ryan/task5/` | Shared vs per-flux surrogates, pooled specialists, 90% intervals | `search.py all`, `report.py`, `pooled_intervals.py pool/calibrate/score` |
+| `notebooks/ryan/task6/` | Learning curves, network width, error by radius and input | `prepare.py clean/split`, `learning_curves.py train/summarize`, `part_b.py capacity/score/analyze` |
+| `notebooks/ryan/task7/` | Transfer to DIII-D shot 193870 | `transfer.py` |
+
+```sh
+python -m unittest discover -s notebooks/ryan/task5 -p test_task5.py
+```
+
+The Task 5–7 course files go in `data/` as described in [data/README.md](data/README.md).
+Trained models (about 800 MB) are not committed; retraining Tasks 5 and 6 takes several hours
+of CPU, and all outputs go to `notebooks/ryan/runs/`. Model training uses `fcntl`, so it needs
+macOS or Linux. TGLF runs need a GACODE install (we used DSMLP).
 
 ### Sweekrit's notebooks (`notebooks/sbhatnagar/`)
 

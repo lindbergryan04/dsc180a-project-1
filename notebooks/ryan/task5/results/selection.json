@@ -1,0 +1,905 @@
+{
+  "initial_matrix_sha256": "6e752255f8258090773a96b99d79de3ebfb57b3033e393e4569b8949d24f2db1",
+  "created_at": "2026-11-13T23:24:36.865143+00:00",
+  "interactions": {
+    "frozen_at": "2026-11-13T23:24:36.954774+00:00",
+    "parents": {
+      "joint": {
+        "structure": "joint_width_256",
+        "activation": "joint_activation_tanh",
+        "input": "joint_input_xnue_identity",
+        "target": "joint_target_q_e_log1p"
+      },
+      "Q_e": {
+        "structure": "qe_bottleneck_64",
+        "activation": "qe_activation_silu",
+        "input": "qe_input_xnue_identity",
+        "target": "qe_target_q_e_log1p"
+      },
+      "Q_i": {
+        "structure": "qi_width_128",
+        "activation": "qi_activation_silu",
+        "input": "qi_input_xnue_identity",
+        "target": "qi_target_q_i_identity"
+      },
+      "Gamma_e": {
+        "structure": "gamma_depth_3",
+        "activation": "gamma_activation_silu",
+        "input": "gamma_input_xnue_identity",
+        "target": "gamma_target_gamma_e_yeo_johnson"
+      }
+    },
+    "grid": [
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "joint_base"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "joint_target_q_e_log1p"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "joint_input_xnue_identity"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "joint_combo_0011"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "joint_activation_tanh"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "joint_combo_0101"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "joint_combo_0110"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "joint_combo_0111"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "joint_width_256"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "joint_combo_1001"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "joint_combo_1010"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "joint_combo_1011"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "joint_combo_1100"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "joint_combo_1101"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "joint_combo_1110"
+      },
+      {
+        "output_mode": "joint",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "joint_combo_1111"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "qe_base"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "qe_target_q_e_log1p"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "qe_input_xnue_identity"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "qe_combo_0011"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "qe_activation_silu"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "qe_combo_0101"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "qe_combo_0110"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "qe_combo_0111"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "qe_bottleneck_64"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "qe_combo_1001"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "qe_combo_1010"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "qe_combo_1011"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "qe_combo_1100"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "qe_combo_1101"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "qe_combo_1110"
+      },
+      {
+        "output_mode": "Q_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "qe_combo_1111"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "qi_base"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "qi_target_q_i_identity"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "qi_input_xnue_identity"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "qi_combo_0011"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "qi_activation_silu"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "qi_combo_0101"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "qi_combo_0110"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "qi_combo_0111"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "qi_width_128"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "qi_combo_1001"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "qi_combo_1010"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "qi_combo_1011"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "qi_combo_1100"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "qi_combo_1101"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "qi_combo_1110"
+      },
+      {
+        "output_mode": "Q_i",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "qi_combo_1111"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "gamma_base"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "gamma_target_gamma_e_yeo_johnson"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "gamma_input_xnue_identity"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "gamma_combo_0011"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "gamma_activation_silu"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "gamma_combo_0101"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "gamma_combo_0110"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 0,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "gamma_combo_0111"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 0,
+        "case_id": "gamma_depth_3"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 0,
+        "target": 1,
+        "case_id": "gamma_combo_1001"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 0,
+        "case_id": "gamma_combo_1010"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 0,
+        "input": 1,
+        "target": 1,
+        "case_id": "gamma_combo_1011"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 0,
+        "case_id": "gamma_combo_1100"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 0,
+        "target": 1,
+        "case_id": "gamma_combo_1101"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 0,
+        "case_id": "gamma_combo_1110"
+      },
+      {
+        "output_mode": "Gamma_e",
+        "structure": 1,
+        "activation": 1,
+        "input": 1,
+        "target": 1,
+        "case_id": "gamma_combo_1111"
+      }
+    ],
+    "matrix_sha256": "eaf3e1f39ba429a44c2be6eb4ae7c06e603eb131c5099b2d65ba67a172bfa433",
+    "new_configurations": 44
+  },
+  "confirmation": {
+    "frozen_at": "2026-11-13T23:32:32.686642+00:00",
+    "roles": {
+      "joint_reference": "confirm_joint_base",
+      "joint_balanced": "confirm_joint_width_256",
+      "joint_best_Q_e": "confirm_joint_bottleneck_activation_tanh",
+      "single_reference_Q_e": "confirm_qe_base",
+      "single_best_Q_e": "confirm_qe_combo_1111",
+      "joint_best_Q_i": "confirm_joint_target_q_i_identity",
+      "single_reference_Q_i": "confirm_qi_base",
+      "single_best_Q_i": "confirm_qi_combo_1011",
+      "joint_best_Gamma_e": "confirm_joint_depth_3",
+      "single_reference_Gamma_e": "confirm_gamma_base",
+      "single_best_Gamma_e": "confirm_gamma_combo_1111",
+      "capacity_control": "confirm_joint_capacity_control"
+    },
+    "matrix_sha256": "1ba1226013cd7f65432ef0f0de8cc29d7d805fe8b0311d6f2790260bf251473f",
+    "repeats": {
+      "1": "142|143|144|145|146",
+      "2": "242|243|244|245|246",
+      "3": "342|343|344|345|346"
+    },
+    "parameter_match_target_per_member_group": 36579,
+    "parameter_match_achieved_per_member": 36452
+  },
+  "final": {
+    "frozen_at": "2026-11-13T23:39:10.009482+00:00",
+    "systems": {
+      "shared": {
+        "Q_e": "confirm_joint_bottleneck_activation_tanh",
+        "Q_i": "confirm_joint_bottleneck_activation_tanh",
+        "Gamma_e": "confirm_joint_bottleneck_activation_tanh"
+      },
+      "output_specific_shared": {
+        "Q_e": "confirm_joint_bottleneck_activation_tanh",
+        "Q_i": "confirm_joint_target_q_i_identity",
+        "Gamma_e": "confirm_joint_bottleneck_activation_tanh"
+      },
+      "separate": {
+        "Q_e": "confirm_qe_combo_1111",
+        "Q_i": "confirm_qi_combo_1011",
+        "Gamma_e": "confirm_gamma_combo_1111"
+      },
+      "shared_reference": {
+        "Q_e": "confirm_joint_base",
+        "Q_i": "confirm_joint_base",
+        "Gamma_e": "confirm_joint_base"
+      },
+      "separate_reference": {
+        "Q_e": "confirm_qe_base",
+        "Q_i": "confirm_qi_base",
+        "Gamma_e": "confirm_gamma_base"
+      },
+      "capacity_control": {
+        "Q_e": "confirm_joint_capacity_control",
+        "Q_i": "confirm_joint_capacity_control",
+        "Gamma_e": "confirm_joint_capacity_control"
+      }
+    },
+    "evaluated_case_ids": [
+      "confirm_gamma_base",
+      "confirm_gamma_combo_1111",
+      "confirm_joint_base",
+      "confirm_joint_bottleneck_activation_tanh",
+      "confirm_joint_capacity_control",
+      "confirm_joint_target_q_i_identity",
+      "confirm_qe_base",
+      "confirm_qe_combo_1111",
+      "confirm_qi_base",
+      "confirm_qi_combo_1011"
+    ],
+    "rankings": {
+      "joint_mean_nrmse": [
+        {
+          "case_id": "confirm_joint_bottleneck_activation_tanh",
+          "score": 0.16955681749517246,
+          "scores_by_repeat": [
+            0.1716200157910639,
+            0.16576594002532352,
+            0.1712844966691299
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_depth_3",
+          "score": 0.1795701612380258,
+          "scores_by_repeat": [
+            0.18337830120333243,
+            0.19095843980723723,
+            0.16437374270350769
+          ],
+          "parameters_per_member": 9315
+        },
+        {
+          "case_id": "confirm_joint_width_256",
+          "score": 0.18023285600504502,
+          "scores_by_repeat": [
+            0.18449902035507504,
+            0.18648354855093477,
+            0.1697159991091253
+          ],
+          "parameters_per_member": 69667
+        },
+        {
+          "case_id": "confirm_joint_target_q_i_identity",
+          "score": 0.1803969364502629,
+          "scores_by_repeat": [
+            0.17025087061932817,
+            0.18298808584486337,
+            0.1879518528865971
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_base",
+          "score": 0.20283312854613544,
+          "scores_by_repeat": [
+            0.20009758556966362,
+            0.19735561778956967,
+            0.21104618227917307
+          ],
+          "parameters_per_member": 5155
+        }
+      ],
+      "joint_Q_e": [
+        {
+          "case_id": "confirm_joint_bottleneck_activation_tanh",
+          "score": 11.061314741135812,
+          "scores_by_repeat": [
+            11.121267757025464,
+            10.690922556862452,
+            11.37175390951952
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_depth_3",
+          "score": 13.02353381316634,
+          "scores_by_repeat": [
+            12.90991524387608,
+            14.069188982054673,
+            12.091497213568266
+          ],
+          "parameters_per_member": 9315
+        },
+        {
+          "case_id": "confirm_joint_width_256",
+          "score": 13.241711220586959,
+          "scores_by_repeat": [
+            13.53821804548657,
+            13.962688638899388,
+            12.224226977374917
+          ],
+          "parameters_per_member": 69667
+        },
+        {
+          "case_id": "confirm_joint_target_q_i_identity",
+          "score": 13.852358717480476,
+          "scores_by_repeat": [
+            13.005906277422907,
+            14.491746480787391,
+            14.059423394231128
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_base",
+          "score": 14.864981763348645,
+          "scores_by_repeat": [
+            14.324810022878708,
+            15.108827212392852,
+            15.161308054774375
+          ],
+          "parameters_per_member": 5155
+        }
+      ],
+      "single_Q_e": [
+        {
+          "case_id": "confirm_qe_combo_1111",
+          "score": 9.49408223538932,
+          "scores_by_repeat": [
+            9.577243157802988,
+            9.286157754660358,
+            9.618845793704612
+          ],
+          "parameters_per_member": 8833
+        },
+        {
+          "case_id": "confirm_qe_base",
+          "score": 12.98636475081325,
+          "scores_by_repeat": [
+            13.52808677652336,
+            12.73865492174204,
+            12.69235255417435
+          ],
+          "parameters_per_member": 5137
+        }
+      ],
+      "joint_Q_i": [
+        {
+          "case_id": "confirm_joint_target_q_i_identity",
+          "score": 1.0202306082205044,
+          "scores_by_repeat": [
+            0.9939563946432032,
+            0.9669675508732228,
+            1.0997678791450871
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_width_256",
+          "score": 1.2406741022837984,
+          "scores_by_repeat": [
+            1.3355082270817125,
+            1.1993825970841885,
+            1.1871314826854946
+          ],
+          "parameters_per_member": 69667
+        },
+        {
+          "case_id": "confirm_joint_depth_3",
+          "score": 1.3454963164089364,
+          "scores_by_repeat": [
+            1.51845294732171,
+            1.3815165969991807,
+            1.1365194049059184
+          ],
+          "parameters_per_member": 9315
+        },
+        {
+          "case_id": "confirm_joint_base",
+          "score": 1.434282860607751,
+          "scores_by_repeat": [
+            1.4283749015906964,
+            1.26310870403802,
+            1.6113649761945363
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_bottleneck_activation_tanh",
+          "score": 1.6104131551233773,
+          "scores_by_repeat": [
+            1.594821543289767,
+            1.6459915729174122,
+            1.5904263491629524
+          ],
+          "parameters_per_member": 5155
+        }
+      ],
+      "single_Q_i": [
+        {
+          "case_id": "confirm_qi_combo_1011",
+          "score": 0.7973283417747528,
+          "scores_by_repeat": [
+            0.8250624223386911,
+            0.8133890209552422,
+            0.7535335820303247
+          ],
+          "parameters_per_member": 18449
+        },
+        {
+          "case_id": "confirm_qi_base",
+          "score": 1.0750820720474972,
+          "scores_by_repeat": [
+            1.0569038910510349,
+            1.1432409472431493,
+            1.0251013778483076
+          ],
+          "parameters_per_member": 5137
+        }
+      ],
+      "joint_Gamma_e": [
+        {
+          "case_id": "confirm_joint_bottleneck_activation_tanh",
+          "score": 0.23156398076332688,
+          "scores_by_repeat": [
+            0.2408571107108727,
+            0.2231492238162969,
+            0.230685607762811
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_depth_3",
+          "score": 0.23658979707718916,
+          "scores_by_repeat": [
+            0.2401877544203137,
+            0.248948828860858,
+            0.2206328079503958
+          ],
+          "parameters_per_member": 9315
+        },
+        {
+          "case_id": "confirm_joint_width_256",
+          "score": 0.2431029220289234,
+          "scores_by_repeat": [
+            0.2424399887113789,
+            0.251128478441021,
+            0.2357402989343703
+          ],
+          "parameters_per_member": 69667
+        },
+        {
+          "case_id": "confirm_joint_target_q_i_identity",
+          "score": 0.24548201339198408,
+          "scores_by_repeat": [
+            0.2307695766293161,
+            0.2403843112909189,
+            0.2652921522557173
+          ],
+          "parameters_per_member": 5155
+        },
+        {
+          "case_id": "confirm_joint_base",
+          "score": 0.2708464242240249,
+          "scores_by_repeat": [
+            0.2780268356982684,
+            0.2544331908550442,
+            0.280079246118762
+          ],
+          "parameters_per_member": 5155
+        }
+      ],
+      "single_Gamma_e": [
+        {
+          "case_id": "confirm_gamma_combo_1111",
+          "score": 0.19590382183561592,
+          "scores_by_repeat": [
+            0.19187066535392,
+            0.1959680470840618,
+            0.1998727530688659
+          ],
+          "parameters_per_member": 9297
+        },
+        {
+          "case_id": "confirm_gamma_base",
+          "score": 0.23102905982719454,
+          "scores_by_repeat": [
+            0.2330732611105184,
+            0.2313314132378291,
+            0.228682505133236
+          ],
+          "parameters_per_member": 5137
+        }
+      ]
+    },
+    "selection_split": "validation",
+    "test_opened": true,
+    "evaluation_started_at": "2026-11-13T23:39:10.094639+00:00",
+    "evaluation_completed_at": "2026-11-13T23:39:17.935268+00:00",
+    "evaluated_datasets": {
+      "test": 1100,
+      "profile_test": 12
+    }
+  }
+}

@@ -43,10 +43,34 @@ Keep downloaded inputs unchanged. The local archives are organized by task:
 | `data/Task2_TGLF_scan/` | `scan_db.tar.gz` |
 | `data/Task3_TGLF_Uncertainty/` | `data_d3d.tar.gz`, `scan_db_outside.tar.gz` |
 | `data/Task4_DIIID_Database/` | `task4_d3d.tar.gz` |
+| `data/Task5_DIIID_Surrogate/` | `team_b_d3d_database.csv`, `d3d_profile_test.tar.gz` (keep both as files) |
+| `data/Task6_DIIID_Surrogate/` | `team_b_d3d_database.csv` (the later, larger release) |
+| `data/Task7_Second_Discharge/` | `d3d_profile_193870.tar.gz` (keep as a file) |
 
-Extract each archive within its task directory, preserving the archive's
-internal folder structure. These task directories are local data locations
-and will need to be populated after cloning the repository.
+Extract each Task 1–4 archive within its task directory, preserving the archive's
+internal folder structure. The Task 5–7 files are read as they are. These task
+directories are local data locations and will need to be populated after cloning
+the repository.
+
+### Tasks 5–7 inputs
+
+The Tasks 5–7 handout ("A DIII-D TGLF Surrogate with Error Bars") supplies the
+12 intermediate-radius profile cases and the second discharge. The two teams'
+Task 4 databases are combined for training. Our own team table is committed as
+`notebooks/ryan/task4/d3d_team_database.csv`; the other files are not committed.
+`notebooks/ryan/task5/data.py` refuses a Task 5 Team B table whose hash differs
+from the one below; check the others with `shasum -a 256` after downloading.
+
+| File | Contents | SHA-256 (first 12) |
+| --- | --- | --- |
+| `Task5_DIIID_Surrogate/team_b_d3d_database.csv` | Team B's Task 4 database for shot 128913, 3,500 rows | `32be24624677` |
+| `Task5_DIIID_Surrogate/d3d_profile_test.tar.gz` | `d3d_profile_test/`: TGLF inputs at the 12 radii r/a = 0.225–0.775 and their answers | `a8d0e48edbdd` |
+| `Task6_DIIID_Surrogate/team_b_d3d_database.csv` | Later Team B release, 75,928 rows: Task 4 runs, intermediate-radius variations, NBASIS resolution checks, wider-range scans, a general scan, and shot 193870 | `7fdca421d6a6` |
+| `Task7_Second_Discharge/d3d_profile_193870.tar.gz` | `d3d_profile_second`: inputs for DIII-D shot 193870 at the same 13 radii | `a3da767e55bb` |
+
+Generated tables go to `data/processed/` (for example
+`data/processed/task6/combined_nbasis12.csv`, written by
+`notebooks/ryan/task6/prepare.py clean`).
 
 As analysis code is added, use `data/generated/` for new TGLF cases and
 simulation outputs, and `data/processed/` for parsed and cleaned tables.
