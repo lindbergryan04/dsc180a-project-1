@@ -10,7 +10,7 @@ input ranges and adding q and magnetic shear as features, were not done.
 | --- | --- |
 | `transfer.py` | Checks the shot-193870 runs against the supplied inputs, then scores every frozen model on six cohorts |
 | `results/transfer_scores.csv` | RMSE, MAE, bias, and R² for each model and cohort |
-| `task7_results.ipynb` | Read-only view of the scores |
+| `01_second_discharge_transfer.ipynb` | Read-only view of the scores |
 
 ```sh
 python notebooks/ryan/task7/transfer.py

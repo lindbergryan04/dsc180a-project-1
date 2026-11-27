@@ -10,7 +10,7 @@ from IPython.core.interactiveshell import InteractiveShell
 from IPython.utils.capture import capture_output
 import matplotlib.pyplot as plt
 from IPython.display import display,Image
-nbpath=root/'Task2_Neural_Networks_Calderon.ipynb'
+nbpath=root/'01_tglf_surrogate_neural_networks.ipynb'
 nb=nbformat.read(nbpath,as_version=4)
 shell=InteractiveShell.instance()
 def show(*args,**kwargs):

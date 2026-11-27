@@ -9,7 +9,7 @@ local inputs while keeping geometry fixed at each radius. Each member contribute
 | `team_database.py` | Merge the four members' exports, check every row, and count cases outside the `scan_db` design limits |
 | `d3d_database_seed180401.csv` | Ryan's 1,000 cases (seed 180401), run on DSMLP |
 | `d3d_team_database.csv` | The 3,884-case team table that Tasks 5–7 train on |
-| `task4_results.ipynb` | Read-only summary of the team table |
+| `01_d3d_team_database.ipynb` | Read-only summary of the team table |
 
 ## Commands
 

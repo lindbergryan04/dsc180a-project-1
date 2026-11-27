@@ -12,7 +12,7 @@ All errors compare with numerical TGLF.
 | `specialists.json` | Architecture, transforms, and training settings of the three specialists |
 | `split.csv` | Frozen split membership |
 | `results/` | The tables the report cites |
-| `task6_results.ipynb` | Read-only view of `results/` |
+| `01_learning_curves_and_overfitting.ipynb` | Read-only view of `results/` |
 
 ## Commands
 

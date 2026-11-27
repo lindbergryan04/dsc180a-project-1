@@ -17,7 +17,7 @@ compares with numerical TGLF, not with CGYRO or experiment.
 | `split.csv` | Frozen split membership |
 | `varied_test.csv` | 240 varied cases at the 12 intermediate radii (seed 180501) with their TGLF answers |
 | `results/` | The tables the report cites |
-| `task5_results.ipynb` | Read-only view of `results/` |
+| `01_d3d_surrogates_with_error_bars.ipynb` | Read-only view of `results/` |
 
 ## Commands
 

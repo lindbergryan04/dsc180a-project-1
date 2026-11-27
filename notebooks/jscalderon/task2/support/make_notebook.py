@@ -433,4 +433,4 @@ md('''
 ''')
 nb={'cells':cells,'metadata':{'kernelspec':{'display_name':'Python 3','language':'python','name':'python3'},'language_info':{'name':'python','version':'3.12'}},'nbformat':4,'nbformat_minor':5}
 for i,c in enumerate(cells):c['id']=f'cell-{i:03}'
-Path('task2/Task2_Neural_Networks_Calderon.ipynb').write_text(json.dumps(nb,indent=1))
+Path('task2/01_tglf_surrogate_neural_networks.ipynb').write_text(json.dumps(nb,indent=1))

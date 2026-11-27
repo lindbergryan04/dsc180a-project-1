@@ -119,7 +119,7 @@ table, sits one level up in `notebooks/sbhatnagar/` and is shared by the tasks.
 | `task1/` | `01_sat3_flux_analysis.ipynb` | Raw SAT3 dataset (see below) | `figures/`, `data/sat3_tglf_table.csv`, `data/sat3_experiments.csv` |
 | `task2/` | `01_scandb_prediction_training.ipynb` | Committed `data/scan_db_table.csv` and `data/sat3_table.csv` | `figures/` |
 | `task3/` | `01_ensemble_uncertainty.ipynb` | Committed `data/*_table.csv` (out-of-range, DIII-D) and Task 2's `data/scan_db_table.csv` | `figures/` |
-| `task4/` | `d3d_data_generation.ipynb` | TGLF on `PATH` and the Task 4 DIII-D profile, unpacked into `task4/data/original_data/` | `data/d3d_mydb_27_cases.csv`, `data/d3d_mydb_27_table.csv`, `figures/` |
+| `task4/` | `01_d3d_database_generation.ipynb` | TGLF on `PATH` and the Task 4 DIII-D profile, unpacked into `task4/data/original_data/` | `data/d3d_mydb_27_cases.csv`, `data/d3d_mydb_27_table.csv`, `figures/` |
 | `task5/` | `01_d3d_surrogate.ipynb` | Committed `data/` tables, plus the team A database `notebooks/ryan/task4/d3d_team_database.csv` | `figures/` |
 
 To run a notebook, start Jupyter in its task folder (for example
@@ -161,9 +161,9 @@ python -m pip install -r "$joey/task2/results/requirements.txt" scipy==1.18.1 th
 out=data/generated/joey
 mkdir -p "$out"
 python "$joey/task1/support/analyze_sat3.py"
-jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=python3 --output=task2 --output-dir="$out" "$joey/task2/Task2_Neural_Networks_Calderon.ipynb"
+jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=python3 --output=task2 --output-dir="$out" "$joey/task2/01_tglf_surrogate_neural_networks.ipynb"
 python "$joey/task2/support/check_results.py" --notebook "$out/task2.ipynb"
-jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=python3 --output=task3 --output-dir="$out" "$joey/task3/Task3_TGLF_Ensemble.ipynb"
+jupyter nbconvert --execute --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=python3 --output=task3 --output-dir="$out" "$joey/task3/01_ensemble_uncertainty.ipynb"
 ```
 
 Task 4 needs TGLF on `PATH` (GACODE commit `1df9cdce`). Extract
@@ -201,7 +201,7 @@ Task 4 saves `cases.csv` next to its notebook. No task writes a `figures/` or
 | `task1/` | `01_sat3_parameter_scans.ipynb` | The 43-case SAT3 starter dataset, unpacked locally at `data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data/` (see [DATA.md](DATA.md)) | `plots/*.png` (7 parameter-scan figures) and `findings_summary.md`, both already in `task1/`, also reproducible by running `generate_plots.py` on its own |
 | `task2/` | `01_tglf_surrogate_models.ipynb` | `scan_db` (5,000 TGLF cases) and the 43-case `SAT3_dataset`, both outside the repo (see Data paths) | Tuned `HistGradientBoostingRegressor` surrogates for $Q_i$, $Q_e$, $\Gamma_e$, saved to `tglf_surrogate_models.joblib`; otherwise inline tables and plots only |
 | `task3/` | `01_surrogate_uncertainty_quantification.ipynb` | `scan_db`, `scan_db_outside` (9 single-parameter out-of-distribution sweeps), and `data_d3d` (DIII-D reference case and 300 perturbed TGLF runs), all outside the repo | A 10-member bootstrap ensemble with validation-calibrated 90% prediction intervals, saved to `tglf_uncertainty_surrogate.joblib`; otherwise inline only |
-| `task4/` | `01_diiid_tglf_database.ipynb` | `task4_d3d` (DIII-D discharge #128913 profile cases at 13 radii, plus the case-generation tools), outside the repo | `notebooks/aryan/task4/cases.csv` (the 1,000 generated input cases) and `notebooks/aryan/task4/d3d_database.csv` (the same cases merged with their TGLF fluxes), both committed |
+| `task4/` | `01_d3d_tglf_database.ipynb` | `task4_d3d` (DIII-D discharge #128913 profile cases at 13 radii, plus the case-generation tools), outside the repo | `notebooks/aryan/task4/cases.csv` (the 1,000 generated input cases) and `notebooks/aryan/task4/d3d_database.csv` (the same cases merged with their TGLF fluxes), both committed |
 
 The model files `tglf_surrogate_models.joblib` (Task 2, about 2.5 MB) and
 `tglf_uncertainty_surrogate.joblib` (Task 3, about 26 MB) are not committed.
