@@ -34,7 +34,7 @@ cd quarter_1_report
 latexmk -xelatex -interaction=nonstopmode -halt-on-error report.tex
 ```
 
-The output is `report.pdf`. The course style uses XCharter and Arial, with
+The output is `report.pdf`; `latexmkrc` sends build intermediates to `build/`, which is gitignored. The course style uses XCharter and Arial, with
 Fira Code for code text. The draft falls back to Latin Modern Mono if Fira Code
 is unavailable. A minimal TeX installation may need additional packages used
 by the course style. For Overleaf, upload `report.tex`, `reference.bib`,

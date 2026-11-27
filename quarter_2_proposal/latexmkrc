@@ -1,0 +1,4 @@
+# latexmk settings for this folder (also used by VS Code LaTeX Workshop).
+# Build intermediates go in build/ (gitignored); the PDF stays next to the .tex.
+$aux_dir  = 'build';
+$pdf_mode = 1;   # pdflatex

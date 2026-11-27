@@ -67,6 +67,9 @@ notebooks/**/original_data/
 # ---------------------------------------------------------------------------
 # LaTeX build files (the report sources and quarter_1_report/report.pdf stay in git)
 # ---------------------------------------------------------------------------
+# latexmk writes intermediates to build/ in each LaTeX folder (see latexmkrc);
+# the patterns below also catch stray files from builds that bypass latexmkrc.
+**/build/
 *.aux
 *.bbl
 *.blg
