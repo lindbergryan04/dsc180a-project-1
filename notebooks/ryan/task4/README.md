@@ -13,7 +13,7 @@ local inputs while keeping geometry fixed at each radius. Each member contribute
 
 ## Commands
 
-From the repository root, after extracting the Task 2 and Task 4 archives (`data/README.md`).
+From the repository root, after extracting the Task 2 and Task 4 archives (`DATA.md`).
 TGLF itself needs a GACODE install (we used DSMLP); every other step runs anywhere.
 
 ```sh

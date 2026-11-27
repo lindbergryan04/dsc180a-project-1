@@ -97,7 +97,7 @@ directory with its own `README.txt`.
 
 ## Building the DIII-D database
 
-Follow [Task 4](../tasks/Task4_DIIID_database.docx) for the full generation
+Follow [Task 4](tasks/Task4_DIIID_database.docx) for the full generation
 procedure. First run the 13 supplied profile cases and compare their fluxes
 with `d3d_profile_answers.dat`. The handout requires agreement to at least
 three digits before generating the larger database.
@@ -153,7 +153,7 @@ electrons, positive for ions), and identify the ion isotope using its mass.
 The supplied two-species cases use species 1 for electrons and species 2 for
 ions. The reader should still use `NS` rather than assume eight output values.
 The block definitions above follow the correction in
-[Task 3](../tasks/Task3_surrogate_uncertainty.docx).
+[Task 3](tasks/Task3_surrogate_uncertainty.docx).
 
 ## Quality checks and derived tables
 
@@ -174,14 +174,14 @@ processed data. Task 2 specifies a fixed-seed 70%/15%/15% split for `scan_db`;
 Task 3 reuses that split. Keep the SAT3 cases separate from `scan_db` training
 and validation.
 
-The [root README](../README.md) gives the commands for Ryan’s analysis and the
+The [root README](README.md) gives the commands for Ryan’s analysis and the
 setup for Sweekrit’s notebooks. Ryan’s commands read these raw task directories
 and write derived tables, trained models, and figures under `notebooks/ryan/runs/`.
 
 ## Project references
 
-- [Task 1: SAT3 starter database](../tasks/Task1_SAT3database_revised.docx)
-- [Task 2: TGLF surrogate models](../tasks/Task2_TGLF_surrogate.docx)
-- [Task 3: Surrogate uncertainty](../tasks/Task3_surrogate_uncertainty.docx)
-- [Task 4: DIII-D database](../tasks/Task4_DIIID_database.docx)
-- [Project scope and schedule](../emily_slides/110226_project.pptx)
+- [Task 1: SAT3 starter database](tasks/Task1_SAT3database_revised.docx)
+- [Task 2: TGLF surrogate models](tasks/Task2_TGLF_surrogate.docx)
+- [Task 3: Surrogate uncertainty](tasks/Task3_surrogate_uncertainty.docx)
+- [Task 4: DIII-D database](tasks/Task4_DIIID_database.docx)
+- [Project scope and schedule](reference_slides/110226_project.pptx)

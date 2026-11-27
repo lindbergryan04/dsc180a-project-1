@@ -8,7 +8,7 @@ design limits. It writes ``d3d_team_database.csv``, ``scan_db_coverage.csv``,
 ``seed27_cases_without_results.csv`` and ``manifest.json`` (input hashes).
 
 Run from the repository root after extracting the Task 2 and Task 4 course archives
-(see ``data/README.md``)::
+(see ``DATA.md``)::
 
     python notebooks/ryan/task4/team_database.py \\
         --profile data/Task4_DIIID_Database/task4_d3d/d3d_profile \\

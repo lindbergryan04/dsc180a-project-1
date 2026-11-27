@@ -62,7 +62,7 @@ def _clean(root):
     for name, expected in SOURCES.items():
         path = SOURCE_PATHS[name]
         if not path.is_file():
-            raise FileNotFoundError(f'Missing {path}. See data/README.md for the Task 5 inputs.')
+            raise FileNotFoundError(f'Missing {path}. See DATA.md for the Task 5 inputs.')
         if sha256(path) != expected:
             raise ValueError(f'{name} changed since the approved split. Use a new experiment version.')
         frame = pd.read_csv(path)

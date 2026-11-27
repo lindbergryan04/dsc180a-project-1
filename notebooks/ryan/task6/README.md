@@ -16,7 +16,7 @@ All errors compare with numerical TGLF.
 
 ## Commands
 
-Needs the Task 6 Team B table (`data/README.md`) and the Task 5 files. From the repository root:
+Needs the Task 6 Team B table (`DATA.md`) and the Task 5 files. From the repository root:
 
 ```sh
 t6=notebooks/ryan/task6

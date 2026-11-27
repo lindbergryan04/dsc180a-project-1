@@ -17,7 +17,7 @@ python notebooks/ryan/task7/transfer.py
 ```
 
 This needs the Task 5 and Task 6 checkpoints (not committed) and the Task 7 course archive
-(`data/README.md`). With the original checkpoints restored, it reproduced
+(`DATA.md`). With the original checkpoints restored, it reproduced
 `transfer_scores.csv` and all 44,520 shot-193870 predictions exactly. It also checks that
 every Task 6 model's shot-128913 test RMSE matches Task 6.
 

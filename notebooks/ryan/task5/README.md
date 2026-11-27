@@ -21,7 +21,7 @@ compares with numerical TGLF, not with CGYRO or experiment.
 
 ## Commands
 
-Place the Task 5 course files as described in `data/README.md`. From the repository root:
+Place the Task 5 course files as described in `DATA.md`. From the repository root:
 
 ```sh
 t5=notebooks/ryan/task5

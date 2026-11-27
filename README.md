@@ -31,24 +31,24 @@ Aryan Nath
 | Path | Contents |
 | --- | --- |
 | `notebooks/` | Individual experiment notebooks for each member. |
-| `data/README.md` | Dataset descriptions, access instructions, file formats, and quality checks. |
+| `DATA.md` | Dataset descriptions, access instructions, file formats, and quality checks. |
 | `data/Task1_TGLF_SAT3_dataset/` | Task 1 SAT3 starter dataset. |
 | `data/Task2_TGLF_scan/` | Task 2 TGLF parameter-scan data. |
 | `data/Task3_TGLF_Uncertainty/` | Task 3 uncertainty and extrapolation datasets. |
 | `data/Task4_DIIID_Database/` | Task 4 DIII-D database materials. |
-| `emily_slides/` | Mentor slides and the group's Week 5 check-in presentation. |
+| `reference_slides/` | Mentor slides and the group's Week 5 check-in presentation. |
 | `references/` | Research papers used for background and related work. |
 | `tasks/` | Mentor-provided instructions for Tasks 1–7. |
-| `report/` | Checkpoint report source and PDF, references, figures, review notes, and course template source. |
+| `quarter_1_report/` | Quarter 1 checkpoint report source and PDF, references, figures, review notes, and course style files. |
 | `requirements.txt` | Pinned Python dependencies for the project. |
 | `.gitignore` | Excludes datasets, local environments, credentials, and generated build files. |
 
-Dataset files under `data/` are stored locally and excluded from Git; only
-`data/README.md` is tracked when committed.
+Dataset files under `data/` are stored locally and excluded from Git; access
+instructions are in `DATA.md`.
 
 ## Data
 
-See [data/README.md](data/README.md) for data access and storage instructions.
+See [DATA.md](DATA.md) for data access and storage instructions.
 
 ## Environment
 
@@ -69,7 +69,7 @@ python -m pip install -r requirements.txt
 
 Ryan’s notebooks contain the exploratory analyses and their saved outputs. To rebuild the reported experiments from the course data, run the commands below from the repository root with the environment above.
 
-Extract the course archives into their respective task directories as described in [data/README.md](data/README.md). Then run the three tasks in order.
+Extract the course archives into their respective task directories as described in [DATA.md](DATA.md). Then run the three tasks in order.
 
 ```sh
 sat3=data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data
@@ -99,7 +99,7 @@ Run them in order; each README lists its inputs and checks.
 python -m unittest discover -s notebooks/ryan/task5 -p test_task5.py
 ```
 
-The Task 5–7 course files go in `data/` as described in [data/README.md](data/README.md).
+The Task 5–7 course files go in `data/` as described in [DATA.md](DATA.md).
 Trained models (about 800 MB) are not committed; retraining Tasks 5 and 6 takes several hours
 of CPU, and all outputs go to `notebooks/ryan/runs/`. Model training uses `fcntl`, so it needs
 macOS or Linux. TGLF runs need a GACODE install (we used DSMLP).
@@ -129,7 +129,7 @@ How to run:
 Tasks 2 and 3 run from a fresh clone with no extra downloads.
 
 Task 1 reads the raw SAT3 dataset, which is not in git (large; see
-[data/README.md](data/README.md) for the source). Put it at
+[DATA.md](DATA.md) for the source). Put it at
 `notebooks/sbhatnagar/task1/data/SAT3_dataset/data/` or set the `SAT3_DIR`
 environment variable to its `data` folder before starting Jupyter:
 
@@ -142,7 +142,7 @@ if you delete that CSV and set `SAT3_DIR`.
 
 ### Joey's analysis (`notebooks/jscalderon/`)
 
-Run the commands below from the repository root. Place the four compressed course archives in the directories listed in [data/README.md](data/README.md). Joey’s tasks read `SAT3_dataset.tar.gz`, `scan_db.tar.gz`, `scan_db_outside.tar.gz`, and `data_d3d.tar.gz` directly from those locations.
+Run the commands below from the repository root. Place the four compressed course archives in the directories listed in [DATA.md](DATA.md). Joey’s tasks read `SAT3_dataset.tar.gz`, `scan_db.tar.gz`, `scan_db_outside.tar.gz`, and `data_d3d.tar.gz` directly from those locations.
 
 Use a separate Python 3.12 environment. Joey’s Task 2 results record pandas 3.1.0, while the shared environment uses 3.0.6.
 
@@ -211,7 +211,7 @@ notebook's own location. Tasks 2-4 instead use plain relative paths
 var override**, and these paths currently resolve correctly only because
 `scan_db/`, `scan_db_outside/`, `data_d3d/`, `task4_d3d/`, and `SAT3_dataset/`
 already sit as siblings of this repo clone, directly inside
-`.../DSC 180A/` (outside the repo, matching `data/README.md`'s note that
+`.../DSC 180A/` (outside the repo, matching `DATA.md`'s note that
 shared course data "can also remain outside the repository"). To reproduce
 Tasks 2-4 from a fresh clone, place or symlink those five directories next to
 (not inside) the cloned repo and start Jupyter from that parent folder, e.g.:
@@ -266,10 +266,10 @@ machine.
 
 ## Report
 
-The current checkpoint draft is [report/report.pdf](report/report.pdf), with
-editable source in [report/report.tex](report/report.tex). It includes the
+The current checkpoint draft is [quarter_1_report/report.pdf](quarter_1_report/report.pdf), with
+editable source in [quarter_1_report/report.tex](quarter_1_report/report.tex). It includes the
 required title, abstract, and introduction, plus documented methods and
-preliminary results. See [report/README.md](report/README.md) for build instructions.
+preliminary results. See [quarter_1_report/README.md](quarter_1_report/README.md) for build instructions.
 
 ## Contributing to the checkpoint
 
@@ -277,8 +277,8 @@ preliminary results. See [report/README.md](report/README.md) for build instruct
    in your own directory under `notebooks/`.
 2. Include the model settings, data splits, preprocessing, metrics, and saved
    results needed to interpret your experiments. Keep data files out of Git.
-3. Coordinate edits with the group. Edit `report/report.tex`, add citations to `report/reference.bib` and figures
-   to `report/figures/`, then rebuild the PDF using the report's build instructions.
+3. Coordinate edits with the group. Edit `quarter_1_report/report.tex`, add citations to `quarter_1_report/reference.bib` and figures
+   to `quarter_1_report/figures/`, then rebuild the PDF using the report's build instructions.
 4. Commit and push your own contribution. The TA requires at least one push
    from every team member. Review the combined report before the group submits
    the report PDF and repository link to Gradescope.

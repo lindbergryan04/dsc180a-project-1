@@ -3,7 +3,7 @@
 Run from the repository root with
 ``python -m unittest discover -s notebooks/ryan/task5 -p test_task5.py``.
 Training fixtures use temporary directories and small synthetic data, never production runs.
-The frozen-split test needs the Task 5 source data (``data/README.md``) and is skipped without it.
+The frozen-split test needs the Task 5 source data (``DATA.md``) and is skipped without it.
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ def tiny_config():
 
 
 @unittest.skipUnless(all(path.is_file() for path in data.SOURCE_PATHS.values()),
-                     'Task 5 source data are not present (see data/README.md)')
+                     'Task 5 source data are not present (see DATA.md)')
 class FrozenDataTests(unittest.TestCase):
     def test_approved_membership_and_signed_particles(self):
         with tempfile.TemporaryDirectory(prefix='tglf-split-check-') as directory:

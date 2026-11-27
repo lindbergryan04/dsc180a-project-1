@@ -35,10 +35,9 @@ Thumbs.db
 desktop.ini
 
 # ---------------------------------------------------------------------------
-# Data: keep datasets out of Git; retain access instructions (data/README.md)
+# Data: keep datasets out of Git; access instructions are in DATA.md
 # ---------------------------------------------------------------------------
 /data/*
-!/data/README.md
 
 # Raw TGLF datasets used by the notebooks (too large for git). Parsed tables
 # such as notebooks/sbhatnagar/task2/data/sat3_table.csv are small and stay in git.
@@ -66,7 +65,7 @@ notebooks/**/original_data/
 /notebooks/ryan/runs/
 
 # ---------------------------------------------------------------------------
-# LaTeX build files (the report sources and report/report.pdf stay in git)
+# LaTeX build files (the report sources and quarter_1_report/report.pdf stay in git)
 # ---------------------------------------------------------------------------
 *.aux
 *.bbl
@@ -88,8 +87,6 @@ notebooks/**/original_data/
 *.synctex*
 *-blx.bib
 
-# Local build output from the course template source
-report/DSC_Capstone_LaTeX_Template/report.pdf
 
 # ---------------------------------------------------------------------------
 # Figure generation intermediates (keep each figure's .tex, .pdf, and .png)

@@ -1,8 +1,8 @@
 # Report draft
 
 `report.tex` is the working checkpoint paper and `report.pdf` is its compiled
-preview. Both use the supplied course template. The report loads its formatting
-files from `style/`. The template source is in `DSC_Capstone_LaTeX_Template/`.
+preview. Both use the supplied course template, whose formatting files are in
+`style/`.
 
 The draft includes an abstract, introduction and literature review, relevant
 data, methods, preliminary results, and a discussion with remaining work.
@@ -30,7 +30,7 @@ Ryan's notebooks; they do not establish a final ranking of all group methods.
 From the repository root, with XeLaTeX, BibTeX, and latexmk installed:
 
 ```sh
-cd report
+cd quarter_1_report
 latexmk -xelatex -interaction=nonstopmode -halt-on-error report.tex
 ```
 

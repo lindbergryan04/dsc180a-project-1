@@ -19,7 +19,7 @@ code('''
 from pathlib import Path
 import os, sys, json, time, copy, gzip, tarfile, hashlib, platform, importlib.metadata
 REPO = next((p for p in (Path.cwd(), *Path.cwd().parents)
-             if (p / 'notebooks/jscalderon').is_dir() and (p / 'data/README.md').is_file()), None)
+             if (p / 'notebooks/jscalderon').is_dir() and (p / 'DATA.md').is_file()), None)
 if REPO is None:
     raise FileNotFoundError('Start Jupyter from the project repository or a directory inside it.')
 DATA = REPO / 'data'
