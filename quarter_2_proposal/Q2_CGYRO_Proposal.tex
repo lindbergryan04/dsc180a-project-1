@@ -4,7 +4,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[hmargin=0.8in,vmargin=0.7in]{geometry}
-\usepackage{amsmath,booktabs,array,longtable}
+\usepackage{amsmath,booktabs,array,float,graphicx}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,skip=4pt]{caption}
+\captionsetup[figure]{skip=6pt}
 \usepackage{enumitem}
 \setlist[itemize,enumerate]{topsep=2pt,itemsep=1pt,parsep=0pt,partopsep=0pt}
 \usepackage[hidelinks]{hyperref}
@@ -13,13 +16,28 @@
  pdfsubject={UC San Diego DSC 180 Quarter 2 research proposal}
 }
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{8pt plus 2pt minus 1pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
 \setlength{\emergencystretch}{1em}
 \makeatletter
 \renewcommand{\section}{\@startsection{section}{1}{0pt}
- {9pt plus 1pt minus 1pt}{4pt}{\normalfont\large\bfseries}}
+ {14pt plus 2pt minus 2pt}{5pt}{\normalfont\large\bfseries}}
 \makeatother
 \pagestyle{plain}
+
+% ---- Table conventions (all tables: \small, caption above, never split, placed where they appear in the source) ----
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{B}[1]{>{\raggedright\arraybackslash\bfseries}p{#1}}
+% \opt starts one bullet inside a table cell; wrapped lines align with the text.
+\newcommand{\opt}{\par\hangindent=0.75em\hangafter=1\noindent\textbullet~}
+% \q adds an italic note under a row name.
+\newcommand{\q}[1]{\par{\normalfont\itshape #1}}
+% \rowsep ends a row and draws a thin rule between rows.
+\newcommand{\rowsep}{\\ \specialrule{0.4pt}{4pt}{4pt}}
+% \tablestyle sets the shared font, row height, and paragraph spacing inside tables.
+\newcommand{\tablestyle}{\small\renewcommand{\arraystretch}{1.15}\setlength{\parskip}{0pt}}
+
 \begin{document}
 \begin{center}
       {\fontsize{17}{20}\selectfont\bfseries
@@ -32,288 +50,297 @@
 
 \section{Objective}
 
-Develop a fast neural network (NN) surrogate for heat and particle transport using broad TGLF training data and sparse nonlinear CGYRO references, and test whether CGYRO-based corrections improve predictions across plasma regimes.
+Use broad TGLF data and sparse nonlinear CGYRO references to train a neural network (NN) correction to TGLF for heat and particle transport, and test whether it moves predictions closer to CGYRO across plasma regimes.
 
 \section{Background: gyrokinetic simulation and quasilinear models}
 \label{sec:background}
 
-Heat and particle losses from the core of a tokamak are dominated by small-scale turbulence driven by temperature and density gradients. Transport codes predict plasma profiles by repeatedly asking a turbulence model for the fluxes produced by a set of local plasma parameters $x$, such as gradients, temperature and density ratios, magnetic geometry, collisionality, and rotation. We focus on three outputs, all in gyro-Bohm units: the ion heat flux $Q_i$, the electron heat flux $Q_e$, and the electron particle flux $\Gamma_e$.
+Turbulence driven by temperature and density gradients dominates heat and particle losses from the core of a tokamak. Transport codes predict plasma profiles by repeatedly asking a turbulence model for the fluxes produced by local plasma parameters $x$: gradients, temperature and density ratios, magnetic geometry, collisionality, and rotation. We predict three fluxes in gyro-Bohm units: the ion heat flux $Q_i$, the electron heat flux $Q_e$, and the electron particle flux $\Gamma_e$.
 
-\textbf{CGYRO (nonlinear gyrokinetics).} CGYRO \cite{candy2016} is the high-fidelity reference for turbulent transport.
+\textbf{CGYRO (nonlinear gyrokinetics)} \cite{candy2016} is the high-fidelity reference for turbulent transport.
 \begin{itemize}
-      \item \textbf{Physics model:} gyrokinetics simplifies the full kinetic equations by
-            averaging over the fast gyration of particles around magnetic field lines. This
-            reduces six phase-space dimensions to five while keeping the physics that drives
-            turbulence.
-      \item \textbf{Method:} CGYRO solves the nonlinear gyrokinetic equations for each
-            particle species in a local flux-tube domain, evolves the turbulence until it
-            saturates, and time-averages the resulting fluxes.
-      \item \textbf{Cost and noise:} a single run costs thousands to hundreds of thousands of
-            CPU-hours, and the time-averaged fluxes carry statistical noise.
-      \item \textbf{Linear runs:} a linear CGYRO run finds only the growth rate of each
-            instability. It is much cheaper but cannot predict how large the turbulence becomes.
+      \item \textbf{Physics model:} gyrokinetics averages over the fast gyration of particles around magnetic field lines, reducing six phase-space dimensions to five while keeping the physics that drives turbulence.
+      \item \textbf{Method:} CGYRO solves the nonlinear gyrokinetic equations for each species in a local flux tube, runs until the turbulence saturates, and time-averages the fluxes.
+      \item \textbf{Cost and noise:} one run costs thousands to hundreds of thousands of CPU-hours, and the averaged fluxes carry statistical noise.
+      \item \textbf{Linear runs:} much cheaper, but they give only growth rates, not the saturated turbulence level.
 \end{itemize}
 
-\textbf{TGLF (quasilinear model).} TGLF \cite{staebler2007} approximates gyrokinetics in three steps:
+\textbf{TGLF (quasilinear model)} \cite{staebler2007} approximates gyrokinetics in three steps:
 \begin{enumerate}
-      \item \textbf{Linear stability:} replace the kinetic equations with a small set of fluid
-            moment equations (a gyro-Landau-fluid model) and solve the linear stability problem
-            on a grid of wavenumbers $k_y$, spanning ion-scale to electron-scale eddies. At each
-            $k_y$ this gives each unstable mode's growth rate $\gamma$, its frequency $\omega$
-            (which identifies the instability type), and a quasilinear weight: the flux carried
-            per unit fluctuation amplitude.
-      \item \textbf{Saturation:} a saturation rule, calibrated against nonlinear gyrokinetic
-            simulations, estimates the saturated fluctuation amplitude at each $k_y$ from the
-            linear spectrum.
+      \item \textbf{Linear stability:} a reduced gyro-Landau-fluid model gives, at each wavenumber $k_y$ from ion to electron scales, each unstable mode's growth rate $\gamma$, its frequency $\omega$ (which identifies the instability type), and its quasilinear weight (flux per unit fluctuation amplitude).
+      \item \textbf{Saturation:} a rule calibrated against nonlinear simulations estimates the saturated amplitude at each $k_y$.
       \item \textbf{Flux:} the predicted flux is the sum over $k_y$ of weight times amplitude.
 \end{enumerate}
 
-A TGLF call takes seconds to minutes, which makes it practical inside transport solvers, and neural network surrogates of TGLF reduce the cost further \cite{meneghini2017}.
+A TGLF call takes seconds to minutes, and NN surrogates of TGLF are faster still \cite{meneghini2017}.
 
-\textbf{Where TGLF and CGYRO disagree.} The linear part of TGLF tracks linear gyrokinetics reasonably well. Much of the discrepancy with nonlinear CGYRO comes from the saturation rule, which must compress nonlinear physics, such as zonal-flow regulation near instability thresholds and coupling between ion-scale and electron-scale turbulence, into a formula. Successive saturation rules, most recently SAT3 \cite{dudding2022}, have reduced this error but not removed it. Because the intermediate TGLF quantities ($\gamma$, $\omega$, quasilinear weights, and per-$k_y$ fluxes) show which instabilities drive transport, they are informative inputs for learning where and how TGLF departs from CGYRO.
+\textbf{Where TGLF and CGYRO disagree.} TGLF's linear step tracks linear gyrokinetics reasonably well. Most of the gap to nonlinear CGYRO comes from the saturation rule, which must compress nonlinear physics, such as zonal-flow regulation near instability thresholds and coupling between ion- and electron-scale turbulence, into a formula. Successive rules, most recently SAT3 \cite{dudding2022}, have narrowed the gap but not closed it. The intermediate TGLF quantities ($\gamma$, $\omega$, quasilinear weights, and per-$k_y$ fluxes) show which instabilities drive transport, so they are useful inputs for learning where TGLF departs from CGYRO.
 
 \section{Prior work}
 
-Machine learning has been applied to the TGLF--CGYRO gap in three main ways:
+Machine learning has addressed the TGLF--CGYRO gap in three ways:
 \begin{itemize}
-      \item \textbf{Fast TGLF surrogates.} Neural networks trained on TGLF outputs reproduce
-            its fluxes at a fraction of the cost \cite{meneghini2017}, and TGLF-WINN improves
-            surrogate training with wavenumber-resolved supervision \cite{cao2026}. These
-            surrogates reproduce TGLF, including its errors relative to nonlinear CGYRO.
-      \item \textbf{Linear gyrokinetic information.} GKNN-0 incorporates linear CGYRO
-            information to address differences between TGLF and gyrokinetic predictions
-            \cite{neiser2024}. Linear runs are cheap, but they do not contain the saturation
-            physics where much of the discrepancy arises.
-      \item \textbf{Learned saturation rules.} SAT3-NN learns saturated turbulence spectra
-            from nonlinear CGYRO simulations to construct a neural saturation model
-            \cite{sar2026}, replacing one component of TGLF with a learned one.
+      \item \textbf{Fast TGLF surrogates:} NNs trained on TGLF reproduce its fluxes at a fraction of the cost \cite{meneghini2017}, and TGLF-WINN adds wavenumber-resolved supervision \cite{cao2026}. These surrogates inherit TGLF's errors relative to CGYRO.
+      \item \textbf{Linear gyrokinetic information:} GKNN-0 uses linear CGYRO information to address differences between TGLF and gyrokinetics \cite{neiser2024}. Linear runs are cheap but miss the saturation physics behind much of the gap.
+      \item \textbf{Learned saturation rules:} SAT3-NN learns saturated spectra from nonlinear CGYRO \cite{sar2026}, replacing one TGLF component with a learned one.
 \end{itemize}
 
-These studies either reproduce TGLF or replace one of its components. To our knowledge, none tests how well a correction learned from a few hundred nonlinear CGYRO cases, dispersed across plasma regimes, transfers to new conditions, or which TGLF information such a correction needs.
+These studies reproduce TGLF or replace one of its components. To our knowledge, none tests whether a correction learned from a few hundred nonlinear CGYRO cases transfers to new conditions, or which TGLF information such a correction needs.
 
 \section{Proposed work and research questions}
 
-We will test whether about 300 nonlinear CGYRO cases can support a correction to TGLF that transfers across plasma regimes. Speed is not the goal: TGLF is run for every prediction, and the aim is to get as close to nonlinear CGYRO as the available TGLF information allows. The work has three parts:
+We test whether about 300 nonlinear CGYRO cases can support a correction to TGLF that transfers across plasma regimes. Speed is not the goal: TGLF runs for every prediction, and the aim is to get as close to CGYRO as TGLF information allows. The work has three parts:
 \begin{enumerate}
-      \item \textbf{Pretrained surrogate.} Train a NN on a large TGLF dataset to predict the
-            5th, 50th, and 95th percentiles of each flux. Its learned representation and its
-            interval width become inputs to the correction.
-      \item \textbf{TGLF-informed correction.} Train a NN on matched TGLF and CGYRO cases
-            that maps TGLF fluxes, TGLF spectral features, and the surrogate's representation
-            to the difference between nonlinear CGYRO and TGLF.
-      \item \textbf{Information ablation.} Measure how much each information source
-            contributes, and compare against a fast surrogate-only variant that runs no
-            physics code.
+      \item \textbf{Pretrained surrogate:} an NN trained on a large TGLF dataset to predict the 5th, 50th, and 95th percentiles of each flux.
+      \item \textbf{TGLF-informed correction:} an NN trained on matched TGLF and CGYRO cases to predict the CGYRO--TGLF difference from TGLF fluxes, TGLF spectral features, and the surrogate's representation.
+      \item \textbf{Information ablation:} a measure of how much each input contributes, compared with a surrogate-only variant that runs no physics code.
 \end{enumerate}
 
-We will address four questions:
+We address four questions:
 \begin{enumerate}
-      \item Does the correction improve agreement with held-out nonlinear CGYRO results? If so, by how much, and in which plasma regimes? Where it makes predictions worse, what causes the deterioration?
-      \item Do the surrogate's 5--95\% interval width or its disagreement with real TGLF predict where TGLF departs from nonlinear CGYRO? If so, can they set how strongly to apply the correction in each case?
-      \item How many nonlinear CGYRO cases does the correction need before it reliably improves predictions?
-      \item Which information does the correction need: TGLF fluxes alone, TGLF spectral features, or the pretrained surrogate? How much accuracy does running TGLF add over the surrogate-only variant?
+      \item Does the correction improve agreement with held-out CGYRO cases? By how much, in which regimes, and what causes it to fail where it makes predictions worse?
+      \item Do the surrogate's 5--95\% interval width or its disagreement with TGLF predict where TGLF departs from CGYRO, and can they set how strongly to apply the correction?
+      \item How many CGYRO cases does the correction need before it reliably improves predictions?
+      \item Which inputs does the correction need (TGLF fluxes, spectral features, or the surrogate's representation), and how much does running TGLF add over the surrogate-only variant?
 \end{enumerate}
 
-For uncorrected TGLF, the surrogate-only variant, and the corrected model, we will report prediction error against nonlinear CGYRO and the width of the predicted intervals. Comparing against uncorrected TGLF separates real improvement from simply reverting to the TGLF baseline.
-
-This research has two goals:
-\begin{enumerate}
-      \item A TGLF-informed, uncertainty-aware hybrid model that moves flux predictions closer to nonlinear CGYRO across tokamak regimes.
-      \item Evidence on how well nonlinear corrections transfer, and where they fail, when CGYRO coverage is sparse.
-\end{enumerate}
+The outcomes are an uncertainty-aware hybrid model that moves flux predictions closer to CGYRO, and evidence on where nonlinear corrections transfer and where they fail when CGYRO coverage is sparse.
 
 \section{Data and a TGLF-informed hybrid model}
 
-We have access to about 300 nonlinear CGYRO cases dispersed across plasma regimes. For every CGYRO case we will run TGLF on the same input deck, with the same TGLF version and saturation settings as the bulk training data, and save both the fluxes and the wavenumber-resolved linear spectra. To pretrain the surrogate, we will also generate a large TGLF dataset by running randomly sampled inputs at the San Diego Supercomputer Center (SDSC).
+\textbf{Data.} About 300 nonlinear CGYRO cases span a range of plasma regimes. For each, we run TGLF on the same input deck, with the same version and saturation settings as the bulk data, and save both the fluxes and the wavenumber-resolved linear spectra. To pretrain the surrogate, we generate a large TGLF dataset from randomly sampled inputs at the San Diego Supercomputer Center (SDSC). We first audit all datasets for coverage, mutual compatibility, and available diagnostics. Figure~\ref{fig:pipeline} summarizes the data and training pipeline.
 
-We will first audit these datasets for coverage, compatibility with one another, and available diagnostics. Unlike TGLF, nonlinear CGYRO is too expensive to run in bulk, so the training set for the correction will stay small. The design below is built around that constraint: TGLF is cheap enough to run for every prediction, and the large TGLF dataset is used to pretrain a representation that the small CGYRO dataset can then fine-tune.
-
-The hybrid model has three components:
+\textbf{Design rationale.} CGYRO is too expensive to run in bulk, so the correction's training set stays small. TGLF is cheap enough to run for every prediction, and the large TGLF dataset pretrains a representation that the small CGYRO dataset can build on. The hybrid model has three components:
 \begin{itemize}
-      \item \textbf{TGLF outputs $T(x)$:} numerical TGLF fluxes $T_c(x)$ and a
-            compressed set of spectral features $s(x)$, such as the peak linear growth rate
-            per mode type, the dominant mode, and the flux-weighted mean wavenumber.
-      \item \textbf{Pretrained surrogate $S_\phi$:} a NN trained on the large TGLF
-            dataset to predict the 5th, 50th, and 95th percentiles of each flux. At
-            prediction time it supplies a learned embedding $z_\phi(x)$ (its final hidden
-            layer), its interval width $w_c(x)$, and its disagreement with real TGLF,
-            $d_c(x)=\lvert S^{50}_{\phi,c}(x)-T_c(x)\rvert$.
-      \item \textbf{Correction model $R_\theta$:} a NN trained on the matched cases to
-            predict the difference between nonlinear CGYRO and numerical TGLF fluxes.
+      \item \textbf{TGLF outputs $T(x)$:} the TGLF fluxes $T_c(x)$ and a compressed set of spectral features $s(x)$, such as the peak growth rate per mode type, the dominant mode, and the flux-weighted mean wavenumber.
+      \item \textbf{Pretrained surrogate $S_\phi$:} supplies a learned embedding $z_\phi(x)$ (its final hidden layer) and, for each channel $c\in\{Q_i,Q_e,\Gamma_e\}$, two uncertainty signals built from its $q$th-percentile predictions $S^{q}_{\phi,c}(x)$:
+            \begin{align}
+                  w_c(x) &= S^{95}_{\phi,c}(x)-S^{5}_{\phi,c}(x),\qquad \text{interval width} \label{eq:width}\\
+                  d_c(x) &= \bigl\lvert S^{50}_{\phi,c}(x)-T_c(x)\bigr\rvert,\qquad \text{disagreement with TGLF} \label{eq:disagree}
+            \end{align}
+      \item \textbf{Correction model $R_\theta$:} predicts the gap between CGYRO and TGLF, trained on the matched cases.
 \end{itemize}
 
-For plasma inputs $x$ and channel $c\in\{Q_i,Q_e,\Gamma_e\}$ (ion heat, electron heat, and electron particle flux), the hybrid prediction is
+For channel $c$, the hybrid prediction is
 \begin{equation}
       \widehat F_c(x)=T_c(x)+\alpha_c(x)\,
       R_{\theta,c}\!\left(x,\,T(x),\,s(x),\,z_\phi(x)\right),
-      \qquad 0\leq\alpha_c(x)\leq1,
+      \qquad 0\leq\alpha_c(x)\leq1.
       \label{eq:hybrid}
 \end{equation}
-where the sum is taken in the correction scale chosen in Section~\ref{sec:design}. Equation~\eqref{eq:hybrid} is written for the additive scale. Table~\ref{tab:scales} gives all three scales: the residual target $r_c$ that $R_{\theta,c}$ is trained to predict on the matched cases, and the hybrid prediction $\widehat F_c$ that maps the weighted correction back to flux units. For brevity, the argument $x$ is dropped and $R_{\theta,c}$ stands for $R_{\theta,c}\!\left(x,T(x),s(x),z_\phi(x)\right)$.
+Figure~\ref{fig:hybrid} shows how the components combine. Equation~\eqref{eq:hybrid} uses the additive scale; Table~\ref{tab:scales} gives the prediction under all three correction scales. On the matched cases, $R_{\theta,c}$ is trained so that the prediction with $\alpha_c=1$ matches CGYRO, and in every scale $\alpha_c=0$ returns TGLF. In the table, $x$ is dropped and $R_{\theta,c}$ abbreviates $R_{\theta,c}(x,T,s,z_\phi)$.
 
-\begin{table}[h]
+\begin{figure}[H]
       \centering
-      \renewcommand{\arraystretch}{1.12}
-      % equal-height rows that fit the stacked fractions
-      \newcommand{\rowstrut}{\rule[-2.4ex]{0pt}{6.2ex}}
-      \begin{tabular}{@{}l l l l@{}}
+      \includegraphics[width=\textwidth]{figures/fig1_hybrid_model.pdf}
+      \caption{Hybrid model at prediction time, shown for the additive scale. TGLF fluxes anchor the prediction; $R_\theta$ predicts the CGYRO--TGLF gap from $x$, $T_c(x)$, $s(x)$, and $z_\phi(x)$; and the surrogate's signals $w_c$ and $d_c$ inform the weight $\alpha_c$. CGYRO enters only as the training target.}
+      \label{fig:hybrid}
+\end{figure}
+
+
+\begin{table}[H]
+      \tablestyle
+      \caption{Correction scales.}
+      \label{tab:scales}
+      \newcommand{\rowstrut}{\rule[-2.4ex]{0pt}{6.2ex}}% equal-height rows that fit the fractions
+      \centering
+      \begin{tabular}{@{}L{0.9in}L{2.6in}L{1.0in}@{}}
             \toprule
-            \textbf{Scale} & \textbf{Residual target $r_c$ (learned by $R_{\theta,c}$)} & \textbf{Hybrid prediction $\widehat F_c$} & \textbf{Channels} \\
+            \textbf{Scale} & \textbf{Hybrid prediction $\widehat F_c$} & \textbf{Channels} \\
             \midrule
-           
             \rowstrut Additive
-              & $\displaystyle F^{\mathrm{CGYRO}}_c - T_c$
               & $\displaystyle T_c + \alpha_c\,R_{\theta,c}$
               & $Q_i,\ Q_e,\ \Gamma_e$ \\
-            \rowstrut$\operatorname{arcsinh}$
-              & $\displaystyle \operatorname{arcsinh}\frac{F^{\mathrm{CGYRO}}_c}{F_0} - \operatorname{arcsinh}\frac{T_c}{F_0}$
+            \rowstrut $\operatorname{arcsinh}$
               & $\displaystyle F_0\sinh\!\Big(\operatorname{arcsinh}\frac{T_c}{F_0} + \alpha_c\,R_{\theta,c}\Big)$
               & $Q_i,\ Q_e,\ \Gamma_e$ \\
             \rowstrut Log ratio
-              & $\displaystyle \log\frac{F^{\mathrm{CGYRO}}_c}{T_c}$
               & $\displaystyle T_c\,\exp\!\big(\alpha_c\,R_{\theta,c}\big)$
               & $Q_i,\ Q_e$ \\
             \bottomrule
       \end{tabular}
-      \caption{Correction scales. In every scale, $\alpha_c=0$ returns TGLF ($\widehat F_c=T_c$), and $\alpha_c=1$ with a perfect correction ($R_{\theta,c}=r_c$) returns CGYRO ($\widehat F_c=F^{\mathrm{CGYRO}}_c$).}
-      \label{tab:scales}
 \end{table}
 
-The three scales are alternatives, not separate final models: one scale per channel is selected on the validation split (Section~\ref{sec:design}). They differ mainly in how training weights errors on cases of different flux magnitude:
+One scale per channel is selected on the validation split (Table~\ref{tab:design}). The scales weight errors differently:
 \begin{itemize}
-      \item \textbf{Additive:} the correction is a flux offset in physical units, which makes it the simplest scale to interpret. It is defined for every channel and allows the correction to change sign. However, fluxes span orders of magnitude, so a squared-error loss on the additive residual is dominated by high-flux cases, and low-flux cases are largely ignored.
-      \item \textbf{Log ratio:} the correction is a multiplicative factor, so training targets relative error and weights low- and high-flux cases equally. Here $\alpha_c$ acts as an exponent on the correction factor, $\big(e^{R_{\theta,c}}\big)^{\alpha_c}$, rather than scaling an offset, and the prediction always keeps the sign of $T_c$. The log ratio is undefined at zero flux and cannot change sign, so it is used only for the heat fluxes $Q_i$ and $Q_e$.
-      \item {\boldmath\textbf{$\operatorname{arcsinh}$:}} a compromise between the two. It is roughly linear (offset-like) for $\lvert F\rvert\ll F_0$ and logarithmic (ratio-like) for $\lvert F\rvert\gg F_0$, so it compresses large fluxes without breaking at zero. Because it is defined for negative values, it covers all three channels, including $\Gamma_e$. The crossover scale $F_0$ is a tuned hyperparameter.
+      \item \textbf{Additive:} a flux offset. It is the simplest to interpret and works for every channel, but the loss is dominated by high-flux cases.
+      \item \textbf{Log ratio:} a multiplicative factor, so training targets relative error and weights all flux levels equally. Here $\alpha_c$ acts as an exponent, $\big(e^{R_{\theta,c}}\big)^{\alpha_c}$. It is undefined at zero flux and cannot change sign, so it is used only for $Q_i$ and $Q_e$.
+      \item {\boldmath\textbf{$\operatorname{arcsinh}$:}} offset-like for $\lvert F\rvert\ll F_0$ and ratio-like for $\lvert F\rvert\gg F_0$, so it compresses large fluxes and still handles zero and negative values, including $\Gamma_e$. The crossover $F_0$ is tuned.
 \end{itemize}
 
-Because the correction is anchored to real TGLF rather than to the surrogate, the residual it learns during training is the same one it corrects at prediction time, and surrogate approximation error does not enter the baseline.
+Because the correction is anchored to real TGLF rather than to the surrogate, the residual learned in training is the one corrected at prediction time, and surrogate error does not enter the baseline.
 
-\textbf{Correction weight $\boldsymbol{\alpha_c}$.} The weight $\alpha_c$ controls how much of the learned correction is applied. At $\alpha_c=0$ the model returns TGLF unchanged, at $\alpha_c=1$ it applies the full correction, and values in between apply part of it. The goal is to rely on the correction only where TGLF is likely to be wrong. Question~2 tests whether two signals from the surrogate can set $\alpha_c$ for each case:
+\textbf{Correction weight $\boldsymbol{\alpha_c}$.} The weight $\alpha_c$ sets how much of the correction to apply, from none ($\alpha_c=0$, plain TGLF) to all ($\alpha_c=1$). The aim is to apply the correction only where TGLF is likely to be wrong. Question~2 tests whether two surrogate signals can set $\alpha_c$ case by case:
 \begin{itemize}
-      \item \textbf{Interval width $\boldsymbol{w_c(x)}$:} wide where TGLF's behavior is hard to learn.
-      \item \textbf{Disagreement $\boldsymbol{d_c(x)}$:} large where the surrogate fails to match real TGLF.
+      \item \textbf{Interval width $\boldsymbol{w_c(x)}$} (Eq.~\ref{eq:width}): wide where TGLF's behavior is hard to learn.
+      \item \textbf{Disagreement $\boldsymbol{d_c(x)}$} (Eq.~\ref{eq:disagree}): large where the surrogate fails to match TGLF.
 \end{itemize}
 
-Both flag regions where TGLF is hard to model, which may also be where it departs from CGYRO.
+Regions that are hard to model may also be where TGLF departs from CGYRO.
 
-\textbf{Cost.} Each hybrid prediction needs one TGLF call, which takes seconds to minutes, compared with thousands of CPU-hours for a nonlinear CGYRO run. As a faster baseline, we also evaluate a surrogate-only variant that replaces $T(x)$ with $S_\phi(x)$ and needs no physics code. Architecture details and the correction rule remain open experimental choices.
+\textbf{Cost.} Each hybrid prediction needs one TGLF call (seconds to minutes), against thousands of CPU-hours for a nonlinear CGYRO run. A surrogate-only variant that replaces $T(x)$ with $S_\phi(x)$ needs no physics code and serves as a fast baseline.
 
-\section{Open design choices}
+\begin{figure}[H]
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig2_data_training.pdf}
+      \caption{Data and training pipeline. (A)~The surrogate is pretrained on a large TGLF dataset and supplies $z_\phi(x)$, $w_c$, and $d_c$ to the correction. (B)~The correction is trained on matched TGLF--CGYRO pairs, using splits grouped by discharge and scan, and evaluated on held-out CGYRO cases.}
+      \label{fig:pipeline}
+\end{figure}
+
+
+\section{Design choices and experiments}
 \label{sec:design}
 
-Each choice below is settled on a validation split before the final evaluation.
+Experiments run in two stages on fixed, grouped train, validation, and test splits (Section~\ref{sec:eval}):
+\begin{itemize}
+      \item \textbf{Stage 1, design selection (Table~\ref{tab:design}):} scored on the validation split. Starting from a default configuration (frozen surrogate, hand-picked spectral features, $\operatorname{arcsinh}$ scale, one fixed $\alpha_c$ per channel, ensemble intervals), each experiment changes one choice and keeps the best option.
+      \item \textbf{Stage 2, ablations (Table~\ref{tab:ablations}):} the selected configuration is frozen and evaluated on the test split. Each ablation changes one component, so any change in error can be attributed to it.
+\end{itemize}
 
-      {\small
-            \renewcommand{\arraystretch}{1.12}
-            \setlength{\parskip}{0pt}
-            \setlength{\LTpre}{0pt}
-            \setlength{\LTpost}{0pt}
-            % \opt starts one bullet inside a table cell; wrapped lines align with the text.
-            \newcommand{\opt}{\par\hangindent=0.75em\hangafter=1\noindent\textbullet~}
-            % \q adds the plain-language question under a choice name.
-            \newcommand{\q}[1]{\par{\normalfont\itshape #1}}
-            \begin{longtable}{@{}>{\raggedright\arraybackslash\bfseries}p{1.25in}
-                  >{\raggedright\arraybackslash}p{3.05in}
-                  >{\raggedright\arraybackslash}p{2.1in}@{}}
-                  \toprule
-                  Choice                                                                                                           & \textbf{Options compared} & \textbf{Constraints and notes} \\
-                  \midrule
-                  %
-                  NN architecture \q{How big, and how many models?}                                                                &
-                  \opt One shared model vs.\ one model per flux channel
-                  \opt Capacity, regularization weight, ensemble size                                                              &
-                  About 300 CGYRO cases: keep the correction small, and rely on regularization and ensembling rather than depth.
-                  \\ \specialrule{0.4pt}{4pt}{4pt}
-                  %
-                  Spectral features \q{How do TGLF spectra become $s(x)$?}                                                         &
-                  \opt Hand-picked: peak growth rate per mode type, dominant mode, electron-scale flux fraction, flux-weighted mean $k_y$
-                  \opt Learned: principal components or a small encoder trained on the large TGLF set                              &
-                  Keep the feature count small for the same reason.
-                  \\ \specialrule{0.4pt}{4pt}{4pt}
-                  %
-                  Correction scale \q{In what space is the residual learned?}                                                      &
-                  \opt Additive residual
-                  \opt Residual in $\operatorname{arcsinh}(F/F_0)$ space
-                  \opt Log ratio $\log(F^{\mathrm{CGYRO}}_c/T_c)$, heat fluxes only                                                &
-                  Additive residuals are dominated by high-flux cases.
-                  $F_0$ is tuned.
-                  Log ratios are undefined at zero flux (use a floor or exclude) and cannot change sign, so $\Gamma_e$ needs $\operatorname{arcsinh}$.
-                  \\ \specialrule{0.4pt}{4pt}{4pt}
-                  %
-                  Correction rule \q{How much of $R_\theta$ to apply?}                                                             &
-                  \opt None ($\alpha_c=0$)
-                  \opt One fixed fraction for all channels
-                  \opt One fixed fraction per channel
-                  \opt Learned $\alpha_c(x)$, driven by $w_c(x)$, $d_c(x)$, distance to the nearest CGYRO case, or ensemble spread &
-                  Fit $\alpha_c$ on a held-out validation fold, not on the cases that train $R_\theta$.
-                  \\ \specialrule{0.4pt}{4pt}{4pt}
-                  %
-                  Surrogate coupling \q{How tightly does $R_\theta$ use $S_\phi$?}                                                 &
-                  \opt Frozen surrogate, $z_\phi(x)$ as fixed features (default)
-                  \opt Fine-tune the surrogate's final layers on CGYRO
-                  \opt Fine-tune the surrogate on CGYRO, no separate $R_\theta$                                                    &
-                  Fine-tuning on about 300 cases risks overfitting.
-                  \\ \specialrule{0.4pt}{4pt}{4pt}
-                  %
-                  Corrected-model intervals \q{Where does the 5--95\% interval come from?}                                         &
-                  \opt Spread across an ensemble of correction models
-                  \opt Correction model that predicts quantiles directly
-                  \opt Either, widened by CGYRO time-averaging error                                                               &
-                  Needed because TGLF is deterministic and has no interval of its own.
-                  \\
-                  %
-                  \bottomrule
-            \end{longtable}
-      }
+\begin{table}[!tp]
+      \tablestyle
+      \caption{Stage 1: design choices, selected on the validation split.}
+      \label{tab:design}
+      \begin{tabular}{@{}B{1.3in}L{3.05in}L{2.2in}@{}}
+            \toprule
+            Choice & \textbf{Options compared} & \textbf{Notes} \\
+            \midrule
+            %
+            D1. Architecture \q{How big, and how many models?} &
+            \opt One shared model vs.\ one model per channel
+            \opt Width, weight decay, and ensemble size &
+            With about 300 cases, favor regularization and ensembling over depth.
+            \rowsep
+            %
+            D2. Spectral features \q{How are TGLF spectra summarized as $s(x)$?} &
+            \opt None
+            \opt Hand-picked: peak growth rate per mode type, dominant mode, electron-scale flux fraction, flux-weighted mean $k_y$
+            \opt Principal components of the spectra
+            \opt Small encoder trained on the large TGLF set &
+            Keep the feature count small to limit overfitting.
+            \rowsep
+            %
+            D3. Correction scale \q{In what space is the residual learned?} &
+            \opt Additive
+            \opt $\operatorname{arcsinh}(F/F_0)$, with a grid over $F_0$
+            \opt Log ratio ($Q_i$ and $Q_e$ only) &
+            One scale per channel (Table~\ref{tab:scales}). Log ratios need a floor or exclusion at zero flux.
+            \rowsep
+            %
+            D4. Surrogate coupling \q{How much of $S_\phi$ is retrained on CGYRO?} &
+            \opt Frozen, with $z_\phi(x)$ as fixed features (default)
+            \opt Fine-tune the final layers, jointly with $R_\theta$ &
+            Fine-tuning on about 300 cases risks overfitting.
+            \rowsep
+            %
+            D5. Interval method \q{Where does the 5--95\% interval come from?} &
+            \opt Spread across an ensemble of correction models
+            \opt Direct quantile prediction
+            \opt Either, widened by CGYRO time-averaging error &
+            Target close to 90\% coverage. TGLF is deterministic and has no interval of its own.
+            \\
+            \bottomrule
+      \end{tabular}
+\end{table}
+
+\begin{table}[!tp]
+      \tablestyle
+      \caption{Stage 2: ablations, reported on the test split.}
+      \label{tab:ablations}
+      \begin{tabular}{@{}B{1.3in}L{3.05in}L{2.2in}@{}}
+            \toprule
+            Ablation & \textbf{Variants compared} & \textbf{What it tests} \\
+            \midrule
+            %
+            A1. Baselines \q{Question~1} &
+            \opt Uncorrected TGLF ($\alpha_c=0$)
+            \opt Pretrained surrogate $S_\phi$ alone
+            \opt NN trained on CGYRO from $x$ only, with no TGLF input
+            \opt Full hybrid model &
+            Whether the correction beats TGLF, and whether anchoring to TGLF beats learning CGYRO from scratch.
+            \rowsep
+            %
+            A2. Information sources \q{Question~4} &
+            Inputs to $R_\theta$:
+            \opt $x$ and TGLF fluxes $T(x)$
+            \opt $+$ spectral features $s(x)$
+            \opt $+$ surrogate embedding $z_\phi(x)$
+            \opt $+$ both (full model) &
+            What each input adds to the correction.
+            \rowsep
+            %
+            A3. Running TGLF \q{Question~4} &
+            \opt Hybrid model with $T(x)$
+            \opt Surrogate-only variant with $S_\phi(x)$ in place of $T(x)$ &
+            What running TGLF adds over a model with no physics code.
+            \rowsep
+            %
+            A4. Uncertainty signals \q{Question~2} &
+            \opt Rank correlation of $w_c(x)$ and $d_c(x)$ with the TGLF error $\lvert F^{\mathrm{CGYRO}}_c-T_c\rvert$ &
+            Whether the surrogate's uncertainty flags where TGLF departs from CGYRO.
+            \rowsep
+            %
+            A5. Correction weight \q{Question~2} &
+            \opt $\alpha_c=0$; one fixed $C$; one fixed $C_c$ per channel
+            \opt Learned $\alpha_c(x)$ from $w_c(x)$, $d_c(x)$, distance to the nearest CGYRO case, or ensemble spread, each alone and then combined &
+            Whether a case-by-case $\alpha_c$ beats a fixed one. $\alpha_c$ is fit on a validation fold, not on $R_\theta$'s training cases.
+            \rowsep
+            %
+            A6. Amount of CGYRO data \q{Question~3} &
+            \opt 25\%, 50\%, 75\%, and 100\% of the training cases, several random draws per size &
+            How many cases the correction needs, and whether more runs would help.
+            \rowsep
+            %
+            A7. Transfer \q{Question~1} &
+            \opt In-range vs.\ out-of-range test cases (Section~\ref{sec:eval})
+            \opt Breakdown by dominant mode &
+            Where the correction transfers and where it makes predictions worse.
+            \\
+            \bottomrule
+      \end{tabular}
+\end{table}
 
 \section{Evaluation under sparse nonlinear coverage}
+\label{sec:eval}
 
-\textbf{Accuracy and uncertainty.} We test the two models:
-\begin{enumerate}
-      \item The base surrogate is evaluated against held-out numerical TGLF runs, which measures how well it reproduces TGLF. These results also check whether fluxes can be predicted from our current input set.
-      \item The corrected model is evaluated against held-out nonlinear CGYRO cases, which measures whether the correction moves predictions closer to CGYRO. TGLF test cases cannot show this, since a useful correction should move predictions away from TGLF.
-\end{enumerate}
+\textbf{Reference data.} Each model is tested against the data it is meant to match:
+\begin{itemize}
+      \item \textbf{Pretrained surrogate:} held-out TGLF runs. This measures how well it reproduces TGLF and whether the inputs suffice to predict the fluxes.
+      \item \textbf{Corrected model:} held-out CGYRO cases. TGLF test cases cannot show its value, since a useful correction should move predictions away from TGLF.
+\end{itemize}
 
-For each model, we report three metrics:
-\begin{enumerate}
-      \item The mean absolute error of the median prediction.
-      \item The coverage fraction of the 5--95\% intervals.
-      \item The average width of the 5--95\% intervals, a proxy for prediction uncertainty.
-\end{enumerate}
+\textbf{Metrics.} For each model we report the mean absolute error of the median prediction, and the coverage and average width of the 5--95\% intervals.
 
-For the corrected model, we also compare four settings of the correction weight $\alpha_c(x)$ (Question~2):
-\begin{enumerate}
-      \item No correction ($\alpha_c(x)=0$), which returns TGLF.
-      \item One fixed fraction for all channels ($\alpha_c(x)=C$).
-      \item One fixed fraction per channel ($\alpha_c(x)=C_c$ for $c\in\{Q_i,Q_e,\Gamma_e\}$).
-      \item A learned $\alpha_c(x)$ for each channel, trained like the correction itself.
-\end{enumerate}
+\textbf{Splits.} CGYRO test cases are grouped by distance to the nearest CGYRO training case in input space. In-range cases test interpolation; out-of-range cases test transfer. Cases from the same discharge or parameter scan are held out together, so near-duplicates cannot leak between training and test sets. If there are few in-range cases, we report only out-of-range results, with their uncertainty.
 
-\textbf{In-range and out-of-range predictions.} We split the CGYRO test cases by their distance to the nearest CGYRO training case in plasma input space. In-range cases lie near training data and test interpolation. Out-of-range cases lie in regions without training data and test whether the correction transfers. Cases from the same discharge or parameter scan are held out together, so near-duplicates cannot leak between the training and test sets. If the archive contains few in-range cases, we report only the out-of-range results, with their uncertainty.
-
-\textbf{Amount of CGYRO data.} We retrain the correction on increasing subsets of the CGYRO training cases and measure test error after correction at each size (Question 3). The resulting learning curve shows how much nonlinear data the correction needs, and whether additional CGYRO runs would still improve accuracy.
-
+% Tables 2 and 3 float, but must appear before this section.
+\FloatBarrier
 \section{Challenges, quarter plan, and outcome}
 
-The main challenges are matching simulation physics and normalization, separating noisy nonlinear averages from systematic discrepancies, and learning transferable corrections from sparse conditions. Furthermore, broad TGLF coverage does not establish reliable nonlinear correction coverage.
+\textbf{Challenges.} We expect two main challenges:
+\begin{enumerate}
+      \item \textbf{Choosing among many design decisions:} the study has many open choices (Tables~\ref{tab:design} and~\ref{tab:ablations}). We must decide which metrics to prioritize when comparing runs, and which proposed runs are worth carrying forward at all.
+      \item \textbf{Beating the state of the art:} the correction must achieve higher accuracy than current TGLF saturation rules, including SAT3 \cite{dudding2022} and learned saturation rules such as SAT3-NN \cite{sar2026}.
+\end{enumerate}
 
-      {\small
-            \noindent
-            \begin{tabular}{@{}p{0.95in}p{5.73in}@{}}
-                  \toprule
-                  \textbf{Period} & \textbf{Milestone}                                                       \\
-                  \midrule
-                  Weeks 1--2      & Audit coverage and compatibility; define scope, splits, and tolerances.  \\[4pt]
-                  Weeks 3--5      & Establish TGLF-surrogate accuracy; train matched correction baselines.   \\[4pt]
-                  Weeks 6--8      & Test correction scales, transferable features, richer targets (including
-                  per-scale correction if data permit), and correction weighting; add
-                  isotope-trend and smoothness checks.                                                       \\[4pt]
-                  Weeks 9--10     & Evaluate frozen models; deliver reproducible code and a paper draft.     \\
-                  \bottomrule
-            \end{tabular}\par
-      }
+\begin{table}[H]
+      \tablestyle
+      \caption{Quarter plan.}
+      \label{tab:plan}
+      \begin{tabular}{@{}L{0.95in}L{5.78in}@{}}
+            \toprule
+            \textbf{Period} & \textbf{Milestone} \\
+            \midrule
+            Winter break & Prepare the TGLF and CGYRO data, and build the initial model and functions: the TGLF surrogate, a basic neural correction, and a final prediction using the additive scale. \\[3pt]
+            Weeks 1--2 & Build the remaining functions and test them to make sure runs are valid. Collect initial results and run Stage~1 design selection (Table~\ref{tab:design}) to decide which experiments are not worth pursuing. \\[3pt]
+            Weeks 3--5 & Run most of the experiments, including the Stage~2 ablations (Table~\ref{tab:ablations}), repeating each with several random seeds to measure both the accuracy and the precision of the system. \\[3pt]
+            Weeks 6--7 & Analyze results: collect the results of all runs, compute correlations, and draw conclusions. \\[3pt]
+            Weeks 8--10 & Reserved for writing a paper draft and cleaning up the code so it is reproducible. \\
+            \bottomrule
+      \end{tabular}
+\end{table}
 
-The study requires no new nonlinear runs. Deliver a fast surrogate, independent evaluation, and a paper draft. If correction fails, investigate coverage, noise, representation, and model choice. Experimental validation and weight-space programming would be subsequent extensions.
+\textbf{Outcome.} The goal is an accurate model of nonlinear CGYRO fluxes that needs only one TGLF call per prediction, reducing the time needed for CGYRO-level predictions by a significant margin.
 
       {\small
             \begin{thebibliography}{9}
