@@ -8,6 +8,7 @@ torch==2.14.1
 matplotlib==3.11.2
 seaborn==0.13.2
 joblib==1.6.0
+threadpoolctl==3.7.0   # imported directly (thread limits for reproducible timing)
 tqdm==4.70.1
 # to run the notebooks
 jupyterlab==4.6.4
