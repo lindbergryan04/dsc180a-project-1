@@ -1,4 +1,18 @@
-# Report draft
+# Reports
+
+## Final Quarter 1 report
+
+`final_report.tex` is the final report and `final_report.pdf` its compiled copy. Its data
+figures (`final_figures/`) are drawn by `make_figures.py` from result tables committed under
+`notebooks/`; nothing is retrained. Rebuild from the repository root (`latexmkrc` selects
+XeLaTeX and sends intermediates to `build/`):
+
+```sh
+python quarter_1_report/make_figures.py
+cd quarter_1_report && latexmk final_report.tex
+```
+
+## Checkpoint draft
 
 `report.tex` is the working checkpoint paper and `report.pdf` is its compiled
 preview. Both use the supplied course template, whose formatting files are in
@@ -21,7 +35,7 @@ Ryan's notebooks; they do not establish a final ranking of all group methods.
 | --- | --- |
 | `report.tex` | Editable report source. |
 | `report.pdf` | Compiled checkpoint preview. |
-| `reference.bib` | Five supplied research papers. |
+| `reference.bib` | References for both reports. |
 | `figures/learning_curves.png` | Existing notebook figure, extracted unchanged. |
 | `style/` | Unchanged course formatting files. |
 

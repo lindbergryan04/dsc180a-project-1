@@ -5,7 +5,7 @@ Quarter 2 proposal for a CGYRO correction.
 
 ## Project overview
 
-**Quarter 1: Neural Network Surrogates for TGLF: Prediction Accuracy and Uncertainty**
+**Quarter 1: Fast Neural Network Surrogates for Fusion Reactor Turbulence Simulations: Accuracy, Error Bars, and Transfer Between DIII-D Plasmas**
 
 We compare methods for approximating the ion heat, electron heat, and electron
 particle fluxes that TGLF predicts, and ask which modeling choices give useful
@@ -98,6 +98,7 @@ Run them in order.
 | `notebooks/ryan/task5/` | Shared vs per-flux surrogates, pooled specialists, 90% intervals | `search.py all`, `report.py`, `pooled_intervals.py pool/calibrate/score` |
 | `notebooks/ryan/task6/` | Learning curves, network width, error by radius and input | `prepare.py clean/split`, `learning_curves.py train/summarize`, `part_b.py capacity/score/analyze` |
 | `notebooks/ryan/task7/` | Transfer to DIII-D shot 193870 | `transfer.py` |
+| `notebooks/ryan/cgyro_check/` | Surrogate error vs. TGLF's difference from nonlinear CGYRO (43 SAT3 cases) | `cgyro_check.py` |
 
 ```sh
 python -m unittest discover -s notebooks/ryan/task5 -p test_task5.py
@@ -269,6 +270,11 @@ Both documents build with `latexmk` from their own folder. Each folder's
 subfolder, leaving only the `.tex` and the PDF at the top.
 
 ### Quarter 1 report
+
+The final report is [quarter_1_report/final_report.pdf](quarter_1_report/final_report.pdf),
+built from [quarter_1_report/final_report.tex](quarter_1_report/final_report.tex). Its data
+figures are drawn by `python quarter_1_report/make_figures.py` from result tables committed
+under `notebooks/`, without retraining any model.
 
 The checkpoint draft is [quarter_1_report/report.pdf](quarter_1_report/report.pdf),
 built from [quarter_1_report/report.tex](quarter_1_report/report.tex). It has

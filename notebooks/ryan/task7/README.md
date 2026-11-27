@@ -4,7 +4,8 @@ Part C, step 1 of the Tasks 5–7 handout: score the frozen shot-128913 models o
 discharge without refitting. `transfer.py` scores all 81 Task 6 ensembles and the three pooled
 Task 5 specialists on the 13 supplied shot-193870 profile inputs and 517 perturbed cases
 (Team B's runs at NBASIS 12/12 with nonnegative heat flux). Part C steps 2–3, widening the
-input ranges and adding q and magnetic shear as features, were not done.
+input ranges and adding q and magnetic shear as features, are in Sweekrit's
+`notebooks/sbhatnagar/task5/` (section 9 of its notebook), not here.
 
 | File | Purpose |
 | --- | --- |
