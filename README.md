@@ -42,8 +42,8 @@ Diego Supercomputer Center).
 | `quarter_2_proposal/` | Quarter 2 proposal source and PDF, plus TikZ sources for its two figures. |
 | `tasks/` | Mentor instructions for Tasks 1 to 7, in Markdown. |
 | `reference_slides/` | Mentor slides and our Week 5 check-in presentation. |
-| `references/` | Citations and DOI links for the background papers. |
 | `DATA.md` | Dataset descriptions, access, file formats, and quality checks. |
+| `REFERENCES.md` | Citations and DOI links for the background papers. |
 | `INSTRUCTIONS.md` | Quarter 1 deadlines and submission rules. |
 | `AI_USE.md` | How we used AI tools. |
 | `requirements.txt` | Pinned Python dependencies. |
