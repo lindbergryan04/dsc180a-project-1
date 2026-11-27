@@ -1,8 +1,0 @@
-# Local raw datasets and saved model weights; keep notebooks and figures reviewable.
-*.tar
-*.tar.gz
-*.pt
-.packages/
-.uv-cache/
-__pycache__/
-.ipynb_checkpoints/

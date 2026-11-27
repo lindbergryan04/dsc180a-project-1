@@ -23,7 +23,7 @@ REPO = next((p for p in (Path.cwd(), *Path.cwd().parents)
 if REPO is None:
     raise FileNotFoundError('Start Jupyter from the project repository or a directory inside it.')
 DATA = REPO / 'data'
-ROOT = REPO / 'notebooks/jscalderon/Task 2'
+ROOT = REPO / 'notebooks/jscalderon/task2'
 if (ROOT / '.packages').exists():
     sys.path.insert(0, str(ROOT / '.packages'))
 os.environ.setdefault('MPLCONFIGDIR', str(ROOT / '.build' / 'mpl'))
@@ -426,7 +426,7 @@ print('Versions:',versions)
 ''')
 md('''
 ## Sources
-- `Task2_TGLF_surrogate.docx`: required split, metrics, baseline, learning sizes and outside test.
+- `Task2_TGLF_surrogate.md`: required split, metrics, baseline, learning sizes and outside test.
 - `Task 2_ Predicting TGLF Results w_ Modeling.pptx`: groupmate model comparison and motivation to focus on neural networks.
 - `TGLF_surrogate.pptx`: groupmate neural-network ensemble, log heat targets and signed particle target.
 - `data/Task2_TGLF_scan/scan_db.tar.gz` and `data/Task1_TGLF_SAT3_dataset/SAT3_dataset.tar.gz` contain the supplied TGLF inputs and fluxes. The saved checksums cover their decompressed TAR streams.

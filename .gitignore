@@ -13,6 +13,9 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+# Local package installs and caches (Joey's notebooks install into .packages/)
+.packages/
+.uv-cache/
 
 # ---------------------------------------------------------------------------
 # Local configuration and credentials
@@ -47,6 +50,7 @@ notebooks/**/data_d3d/
 notebooks/**/original_data/
 
 # Downloaded archives
+*.tar
 *.tar.gz
 *.zip
 

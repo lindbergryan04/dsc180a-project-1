@@ -45,7 +45,7 @@ SOURCES = [
     ("Ryan", 180401, MEMBERS / "ryan/task4/d3d_database_seed180401.csv", "case inputs", "d3d_database_seed180401.csv"),
     ("Sweekrit", 27, MEMBERS / "sbhatnagar/task4/data/d3d_mydb_27_table.csv", "case inputs", "d3d_mydb_27_table.csv"),
     ("Aryan", 4, MEMBERS / "aryan/task4/d3d_database.csv", "case plan", "d3d_database.csv"),
-    ("Joey", 3, MEMBERS / "jscalderon/Task 4/d3d_database.csv", "case plan", "joey_d3d_database.csv"),
+    ("Joey", 3, MEMBERS / "jscalderon/task4/d3d_database.csv", "case plan", "joey_d3d_database.csv"),
 ]
 SWEEKRIT_PLAN = MEMBERS / "sbhatnagar/task4/data/d3d_mydb_27_cases.csv"
 VARIED = ["RLTS_1", "RLTS_2", "RLNS_1", "TAUS_2", "XNUE"]

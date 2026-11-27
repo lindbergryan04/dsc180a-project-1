@@ -24,7 +24,7 @@ function scatter(s,{title,cases,key,xkey,xTitle,yMax,yUnit,color=blue,three=fals
  yAxis:{title:{text:'Heat flux (gyro-Bohm units)',textStyle:{fontSize:18,fill:ink}},textStyle:axisStyle,min:0,max:yMax,majorUnit:yUnit,numberFormatCode:'0',majorGridlines:{fill:'#DFE6EB',width:1},line:{fill:'none',width:0}}
  });applyPresentationChartFont(c,{fontFamily:font});for(let i=0;i<series.length;i++)c.series.getItemAt(i).dataLabels.textStyle.typeface=font;return c;
 }
-const source='Source: SAT3_dataset.tar, data/<case>/tglf_sat2/input.tglf.gen and out.tglf.gbflux. Task1_SAT3database_revised.docx defines the file layout. Species 1 is the electron (ZS_1=-1), species 2 is the singly charged main ion (ZS_2=1). All heat fluxes are TGLF predictions with SAT_RULE=2 and UNITS=GYRO. These are normalized model outputs, not measured heat losses or CGYRO validation. Lines connect simulated cases and do not establish behavior between sampled points.';
+const source='Source: SAT3_dataset.tar, data/<case>/tglf_sat2/input.tglf.gen and out.tglf.gbflux. Task1_SAT3database_revised.md defines the file layout. Species 1 is the electron (ZS_1=-1), species 2 is the singly charged main ion (ZS_2=1). All heat fluxes are TGLF predictions with SAT_RULE=2 and UNITS=GYRO. These are normalized model outputs, not measured heat losses or CGYRO validation. Lines connect simulated cases and do not establish behavior between sampled points.';
 {
 const s=base('Steeper temperature gradients raise heat transport','Matched H, D and T scans with both electron and ion temperature gradients changing together');
 scatter(s,{title:'Ion heat flux',cases:['b','c','a','d'],key:'Q_i',xkey:'RLTS_2',xTitle:'Temperature gradients (RLTS_1 = RLTS_2)',yMax:80,yUnit:20,three:true,xMin:1.5,xMax:3.5,xMajor:.5});
