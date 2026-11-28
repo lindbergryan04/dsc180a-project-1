@@ -37,7 +37,7 @@ Diego Supercomputer Center).
 | Path | Contents |
 | --- | --- |
 | `notebooks/` | One folder per member, with a `taskN/` folder per task. |
-| `src/` | Shared helpers: `tglf_parser.py` reads TGLF run folders and `d3d_profile.py` builds DIII-D inputs. |
+| `src/` | Shared helpers: `tglf_parser.py` reads TGLF run folders into per-species `Gamma`, `Q`, `Pi` (momentum flux), and `S` (energy exchange) columns, and `d3d_profile.py` builds DIII-D inputs. |
 | `quarter_1_report/` | Quarter 1 report source, PDF, figures, and course style files. |
 | `quarter_2_proposal/` | Quarter 2 proposal source and PDF, plus TikZ sources for its two figures. |
 | `tasks/` | Mentor instructions for Tasks 1 to 7, in Markdown. |
@@ -194,74 +194,75 @@ without rerunning, run `python "$joey/task2/support/check_results.py"`.
 ### Aryan (`notebooks/aryan/`)
 
 Each task folder holds one notebook. Tasks 1 to 3 show figures and tables inline;
-Task 4 saves `cases.csv` next to its notebook. No task writes a `figures/` or
-`data/` folder.
+Task 4 writes `d3d_database.csv` into its `task4_d3d/` data folder, and copies of
+that table and its `cases.csv` input are committed next to the notebook. No task
+writes a `figures/` folder.
 
 | Task | Notebook | Needs (raw data) | Produces |
 | --- | --- | --- | --- |
 | `task1/` | `01_sat3_parameter_scans.ipynb` | The 43-case SAT3 starter dataset, unpacked locally at `data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data/` (see [DATA.md](DATA.md)) | `plots/*.png` (7 parameter-scan figures) and `findings_summary.md`, both already in `task1/`, also reproducible by running `generate_plots.py` on its own |
-| `task2/` | `01_tglf_surrogate_models.ipynb` | `scan_db` (5,000 TGLF cases) and the 43-case `SAT3_dataset`, both outside the repo (see Data paths) | Tuned `HistGradientBoostingRegressor` surrogates for $Q_i$, $Q_e$, $\Gamma_e$, saved to `tglf_surrogate_models.joblib`; otherwise inline tables and plots only |
-| `task3/` | `01_surrogate_uncertainty_quantification.ipynb` | `scan_db`, `scan_db_outside` (9 single-parameter out-of-distribution sweeps), and `data_d3d` (DIII-D reference case and 300 perturbed TGLF runs), all outside the repo | A 10-member bootstrap ensemble with validation-calibrated 90% prediction intervals, saved to `tglf_uncertainty_surrogate.joblib`; otherwise inline only |
-| `task4/` | `01_d3d_tglf_database.ipynb` | `task4_d3d` (DIII-D discharge #128913 profile cases at 13 radii, plus the case-generation tools), outside the repo | `notebooks/aryan/task4/cases.csv` (the 1,000 generated input cases) and `notebooks/aryan/task4/d3d_database.csv` (the same cases merged with their TGLF fluxes), both committed |
+| `task2/` | `01_tglf_surrogate_models.ipynb` | `scan_db` (5,000 TGLF cases) and the 43-case `SAT3_dataset`, both unpacked under `data/` (see Data paths) | Tuned `HistGradientBoostingRegressor` surrogates for $Q_i$, $Q_e$, $\Gamma_e$, saved to `tglf_surrogate_models.joblib`; otherwise inline tables and plots only |
+| `task3/` | `01_surrogate_uncertainty_quantification.ipynb` | `scan_db`, `scan_db_outside` (9 single-parameter out-of-distribution sweeps), and `data_d3d` (DIII-D reference case and 300 perturbed TGLF runs), all unpacked under `data/` | A 10-member bootstrap ensemble with validation-calibrated 90% prediction intervals, saved to `tglf_uncertainty_surrogate.joblib`; otherwise inline only |
+| `task4/` | `01_d3d_tglf_database.ipynb` | `task4_d3d` (DIII-D discharge #128913 profile cases at 13 radii, plus the case-generation tools), unpacked under `data/`, and TGLF outputs that are not in the repo (see Data paths) | `d3d_database.csv` (the 1,000 generated input cases merged with their TGLF fluxes); copies of it and of `cases.csv` (the inputs) are committed in `notebooks/aryan/task4/` |
 
 The model files `tglf_surrogate_models.joblib` (Task 2, about 2.5 MB) and
 `tglf_uncertainty_surrogate.joblib` (Task 3, about 26 MB) are not committed.
-They are written to the notebook's working directory, the `.../DSC 180A/`
-folder that contains the repo clone, not inside `dsc180a-project-1/`.
+They are written to the notebook's working directory (its own `task2/` or
+`task3/` folder when opened in Jupyter), where `.gitignore` keeps them out of Git.
 
 #### Data paths
 
-Task 1 finds its dataset through the `SAT3_DATA_DIR` environment variable or a
-fallback, `data/Task1_TGLF_SAT3_dataset/SAT3_dataset/data/`, located relative to
-the notebook. Tasks 2 to 4 use plain relative paths with no override
-(`scan_db/data`, `SAT3_dataset/data`, `data_d3d/d3d_uq/data`,
-`task4_d3d/d3d_profile/...`, `task4_d3d/d3d_mydb_4/cases.csv`). These resolve
-only because `scan_db/`, `scan_db_outside/`, `data_d3d/`, `task4_d3d/`, and
-`SAT3_dataset/` sit next to the repo clone in `.../DSC 180A/` (DATA.md notes
-that shared course data "can also remain outside the repository"). From a fresh
-clone, place or symlink those five folders next to the repo and start Jupyter
-from that parent folder:
+All four notebooks and `task1/generate_plots.py` find the repository root on
+their own and read the course data from `data/`, in the layout given in
+[DATA.md](DATA.md):
 
-```sh
-# from the folder that will contain the repo clone
-ln -s /path/to/scan_db scan_db
-ln -s /path/to/scan_db_outside scan_db_outside
-ln -s /path/to/data_d3d data_d3d
-ln -s /path/to/task4_d3d task4_d3d
-ln -s /path/to/SAT3_dataset SAT3_dataset
-cd dsc180a-project-1 && jupyter lab   # or: jupyter lab from the parent folder itself
-```
+| Task | Folder under `data/` |
+| --- | --- |
+| 1, 2 | `Task1_TGLF_SAT3_dataset/SAT3_dataset/data/` |
+| 2, 3 | `Task2_TGLF_scan/scan_db/data/` |
+| 3 | `Task3_TGLF_Uncertainty/scan_db_outside/` and `Task3_TGLF_Uncertainty/data_d3d/` |
+| 4 | `Task4_DIIID_Database/task4_d3d/` |
 
-Tasks 2 and 3 also `import parse_sat3`, a standalone module with the same
-`load_all_cases()` as `src/tglf_parser.py`. It is not in this repository, so
-those two notebooks need it on the import path (next to the notebook or on
-`PYTHONPATH`). Task 1 imports `tglf_parser` from `src/`, finding the repo root
-automatically. Task 4 needs neither; it reads `cases.csv` and
-`out.tglf.gbflux` directly.
+Task 1 also accepts a `SAT3_DATA_DIR` override. Tasks 1 to 3 and
+`generate_plots.py` parse TGLF output with `load_all_cases()` from
+`src/tglf_parser.py`, which replaced the standalone `parse_sat3.py`. Task 4
+reads `out.tglf.gbflux` directly.
+
+Task 4 also needs TGLF outputs that are in neither the course archive nor this
+repository: `out.tglf.gbflux` for the 13 profile radii
+(`task4_d3d/d3d_profile/r0XX/tglf_sat2/`) and the `task4_d3d/d3d_mydb_4/`
+folder with the 1,000 generated cases and their outputs. Producing them requires
+running TGLF (see [Task 4](tasks/Task4_DIIID_database.md)), so the notebook's
+saved outputs are from Aryan's run.
 
 #### Running
 
 Use the shared environment above; Task 2's `xgboost` is already pinned in
-`requirements.txt`.
+`requirements.txt`. Unpack the data as described in [DATA.md](DATA.md), then,
+from the repository root:
 
 ```sh
-# Task 1: resolves the dataset from data/ once it is unpacked there (see DATA.md)
-cd notebooks/aryan/task1 && jupyter lab   # run 01_sat3_parameter_scans.ipynb top to bottom
-# optional override if the dataset lives somewhere else:
+jupyter lab   # open and run notebooks/aryan/task{1,2,3}/*.ipynb top to bottom
+python notebooks/aryan/task1/generate_plots.py   # rewrites task1/plots/*.png
+# optional Task 1 override if the dataset lives somewhere else:
 export SAT3_DATA_DIR=/path/to/SAT3_dataset/data
-
-# Tasks 2-4: start Jupyter from the parent folder with the symlinks above in place
-cd "/path/to/DSC 180A"
-jupyter lab   # open and run notebooks/aryan/task{2,3,4}/*.ipynb top to bottom
 ```
+
+Task 4 runs the same way once its TGLF outputs are in place.
 
 Run each notebook top to bottom, in any order. Tasks 2 and 3 set a local
 `random_seed = 42` for the 70/15/15 `scan_db` train/validation/test split, the
 `HistGradientBoostingRegressor` fits, and Task 3's bootstrap resampling. Task
-4's 1,000 cases came from `SEED = 4` in the external script
-`task4_d3d/tools/make_db.py`, which produced the committed `cases.csv`; the
-notebook only reads that file. Results should match on any CPU, though timings
-depend on the machine.
+4's 1,000 cases came from `SEED = 4` in Aryan's filled-in copy of the course
+template `task4_d3d/tools/make_db_template.py`, which writes `d3d_mydb_4/`
+next to `d3d_profile/`. That script is not in this repository; the committed
+`cases.csv` records the inputs it drew, and the notebook only reads that file.
+In the pinned environment, Task 2 reproduces its saved outputs exactly apart
+from timings. Task 3's saved outputs come from a run in the pinned environment,
+which gives the same numbers on every run; the report cites these. Aryan's
+original Python 3.13 run gave slightly different ensemble numbers, for example
+test coverage of 91.20%, 87.87%, and 86.80% for $Q_i$, $Q_e$, and $\Gamma_e$
+against 89.60%, 90.40%, and 89.47% now.
 
 ## Report and proposal
 

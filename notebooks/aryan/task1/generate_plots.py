@@ -1,9 +1,14 @@
 import os
+import sys
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import pandas as pd
-from parse_sat3 import load_all_cases
+
+# Use the shared TGLF parser in src/ (the former parse_sat3.py) and the data/ layout in DATA.md.
+REPO_ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO_ROOT / "src"))
+from tglf_parser import load_all_cases
 
 
 def plot_scan(
@@ -105,11 +110,11 @@ def plot_scan(
 
 
 def main():
-    dataset_path = Path("SAT3_dataset/data")
+    dataset_path = REPO_ROOT / "data" / "Task1_TGLF_SAT3_dataset" / "SAT3_dataset" / "data"
     df, _ = load_all_cases(dataset_path)
     df["letter"] = df["case"].apply(lambda x: x.split("_")[0])
 
-    out_dir = Path("plots")
+    out_dir = Path(__file__).resolve().parent / "plots"
     out_dir.mkdir(exist_ok=True, parents=True)
 
     plot_scan(

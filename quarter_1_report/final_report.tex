@@ -871,10 +871,11 @@ Aryan trained a histogram gradient-boosting regressor \citep{friedman2001,ke2017
 for each flux on its own 70/15/15 split of \texttt{scan\_db}, and attached intervals from a
 10-member bootstrap ensemble rescaled on validation. On its 750 test cases it reduced RMSE
 by 43.5\%, 38.6\%, and 53.6\% for $Q_i$, $Q_e$, and $\Gamma_e$ relative to ridge regression,
-with $R^2$ of 0.846, 0.829, and 0.897, and its intervals covered 91.2\%, 87.9\%, and 86.8\%.
-Outside the training ranges its error grew by up to a factor of 6.8 while its bootstrap
+with $R^2$ of 0.846, 0.829, and 0.897, and its intervals covered 89.6\%, 90.4\%, and 89.5\%.
+Outside the training ranges its error grew by up to a factor of 6.7 while its bootstrap
 spread grew far less, because trees extrapolate as constants beyond the last split; coverage
-fell to 53\% for $Q_i$ when the ion temperature gradient left its range. Each model trained
+fell to 60\% for $Q_i$ when the ion temperature gradient or the Shafranov shift left its
+range. Each model trained
 in 1--2\,s and predicted in about 12--15\,$\mu$s per case in batches.
 
 \subsection{Further Stage 5 studies}
