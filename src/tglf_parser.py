@@ -91,9 +91,12 @@ def parse_case(case_dir):
     if len(flux_vals) != expected_flux_count:
         raise ValueError(f"Expected {expected_flux_count} flux values in {flux_file}, found {len(flux_vals)}")
 
+    # Blocks in out.tglf.gbflux: particle flux Gamma, heat flux Q, momentum flux Pi,
+    # energy exchange S (see DATA.md). Earlier handouts called block 4 "Pi".
     gamma_block = flux_vals[0:ns]
     q_block = flux_vals[ns:2 * ns]
-    pi_block = flux_vals[3 * ns:4 * ns]
+    pi_block = flux_vals[2 * ns:3 * ns]
+    s_block = flux_vals[3 * ns:4 * ns]
 
     for i in range(1, ns + 1):
         case_dict[f"Gamma_{i}"] = gamma_block[i - 1]
@@ -109,6 +112,14 @@ def parse_case(case_dir):
             case_dict["Gamma_i"] = gamma_block[i - 1]
             case_dict["Q_i"] = q_block[i - 1]
             case_dict["Pi_i"] = pi_block[i - 1]
+
+    # Energy exchange columns go after the existing ones so their order is unchanged.
+    for i in range(1, ns + 1):
+        case_dict[f"S_{i}"] = s_block[i - 1]
+        if case_dict[f"species_type_{i}"] == "electron":
+            case_dict["S_e"] = s_block[i - 1]
+        else:
+            case_dict["S_i"] = s_block[i - 1]
 
     return case_dict
 

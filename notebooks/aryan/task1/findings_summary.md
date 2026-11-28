@@ -3,7 +3,7 @@
 ## 1. Dataset Architecture
 The SAT3 starter dataset consists of 43 simulation runs under `data/<case>/tglf_sat2/`. Each case has identical data structures:
 - `input.tglf.gen`: 180 total plasma and numerical settings.
-- `out.tglf.gbflux`: 8 values ($4 \times NS$ for $NS=2$) representing Particle Flux $\Gamma$, Heat Flux $Q$, Exchange (skipped), and Toroidal Momentum Flux $\Pi$.
+- `out.tglf.gbflux`: 8 values ($4 \times NS$ for $NS=2$) representing Particle Flux $\Gamma$, Heat Flux $Q$, Toroidal Momentum Flux $\Pi$ (at most $2.5 \times 10^{-4}$ in these runs), and Energy Exchange $S$.
 
 ### Standard Reference Baseline (`a`)
 - Temperature gradients: `RLTS_1 = RLTS_2 = 3.0`
@@ -35,11 +35,11 @@ The SAT3 starter dataset consists of 43 simulation runs under `data/<case>/tglf_
 ## 3. Deuterium Focused Scans
 
 ### A. Magnetic Shear (`Q_PRIME_LOC`)
-- `g_D` (4.0): $Q_i = 18.47$, $Q_e = 7.04$, $\Pi_i = -2.26$
-- `h_D` (8.0): $Q_i = 30.01$, $Q_e = 10.97$, $\Pi_i = -4.29$
-- `a_D` (16.0): $Q_i = 43.10$, $Q_e = 15.26$, $\Pi_i = -10.55$
-- `i_D` (24.0): $Q_i = 51.56$, $Q_e = 17.41$, $\Pi_i = -18.14$
-- **Trend**: Both heat and momentum transport increase monotonically with higher magnetic shear.
+- `g_D` (4.0): $Q_i = 18.47$, $Q_e = 7.04$, $S_i = -2.26$
+- `h_D` (8.0): $Q_i = 30.01$, $Q_e = 10.97$, $S_i = -4.29$
+- `a_D` (16.0): $Q_i = 43.10$, $Q_e = 15.26$, $S_i = -10.55$
+- `i_D` (24.0): $Q_i = 51.56$, $Q_e = 17.41$, $S_i = -18.14$
+- **Trend**: Both heat fluxes and the size of the ion energy exchange $|S_i|$ increase monotonically with higher magnetic shear.
 
 ### B. Collision Frequency (`XNUE`)
 - Baseline drive (`RLNS = 1.0`):
