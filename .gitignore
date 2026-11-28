@@ -99,3 +99,6 @@ notebooks/**/original_data/
 # Figure generation intermediates (keep each figure's .tex, .pdf, and .png)
 # ---------------------------------------------------------------------------
 quarter_2_proposal/figures/*_review.json
+
+# graphify knowledge graph (local)
+graphify-out/
